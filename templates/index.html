@@ -1,0 +1,70 @@
+{% extends 'david/comm/layout.html' %}
+{% block content %}
+    
+<main class="page-wrapper ">
+  <nav class="container mt-lg-4 pt-5" aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0 pt-5">
+      <li class="breadcrumb-item " aria-current="page">기술 논문</li>
+    </ol>
+  </nav>
+  <!-- Page content -->
+  <section class="container mt-4 mb-lg-5 pt-lg-2 pb-5">
+
+    <!-- Page title + Layout switcher -->
+    <div class="d-flex align-items-center justify-content-between mb-4 pb-1 pb-md-3">
+      <h1 class="mb-0">장애인활동지원사 전자바우처</h1>
+      <div class="d-flex align-items-center ms-sm-4 ms-3">
+      </div>
+    </div>
+
+    <!-- Blog grid + Sidebar -->
+    <div class="row">
+      <div class="col-xl-12 col-lg-12">
+        <div class="pe-xl-5" id="page_wrapper">
+           
+          {% include 'david/inner/paper/list.html' %} 
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+
+{% include 'david/comm/footer.html' %} 
+{% block script %}
+<script type="text/javascript">
+  window.addEventListener('load', function() {
+      // 페이지가 로드된 후 실행될 코드
+      console.log('페이지가 완전히 로드되었습니다.');
+      
+  });
+
+  function get_inner_page(sidebar_url){
+    /* sidebar click */
+      fetch(sidebar_url, {
+        headers : {'Content-Type' : 'text/html'}
+        , method : 'get'
+      })
+      .then((response) => {
+
+          if(!response.ok){
+            throw new Error(`HTTP error! status: ${response.status}`)
+          }
+          return response.text()
+        }
+      )
+      .then( (data) => {
+        document.getElementById('page_wrapper').innerHTML = data;
+      }
+
+      )
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+
+  }
+
+</script>
+{% endblock %}
+{% endblock %}

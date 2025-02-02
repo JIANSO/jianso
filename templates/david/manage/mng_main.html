@@ -1,0 +1,95 @@
+{% extends 'anne/manage/mng_comm.html' %}
+{% block content %}
+    <main class="docs-container pt-5">
+      <div class="container-fluid px-xxl-5 px-lg-4 pt-4 pt-lg-5 pb-2 pb-lg-4">
+        
+        <!-- Page title -->
+        <div class="d-sm-flex align-items-end justify-content-between ps-lg-2 ps-xxl-0 mt-2 mt-lg-0 pt-4 mb-n3">
+          <div class="me-4">
+            <h1 class="pb-1">Manage library</h1>           
+          </div>         
+        </div>        
+
+        <!-- Supported input types -->
+        <section id="forms-types" class="border-bottom py-5 ps-lg-2 ps-xxl-0">
+         
+          <form method="POST" action="/anne_mng/insert_library">
+          <div class="tab-content pt-1">
+            <div class="tab-pane fade show active" id="preview1" role="tabpanel">
+              <div class="mb-4 row align-items-center">
+                <label class="col-md-2 col-form-label fs-sm" for="text-input">depth_1</label>
+                <div class="col-md-10">                
+                  <select class="form-select" id="select-input" name="depth_1">
+                    <option>YOUTUBE</option>                                  
+                  </select>
+                </div>
+              </div>
+              <div class="mb-4 row align-items-center">
+                
+                  <label for="select-input" class="col-md-2 col-form-label fs-sm">depth_2</label>                  
+                  <div class="col-md-10">
+                    <select class="form-select" id="select-input" name="depth_2">
+                      <option>CHURCH</option>
+                      <option>PRAISE</option>                  
+                    </select>
+                  </div>
+              
+              </div>
+              
+              <div class="mb-4 row align-items-center">
+                <label for="select-input" class="col-md-2 col-form-label fs-sm">depth_3</label>
+                <div class="col-md-10">
+                <select class="form-select" id="select-input" name="depth_3">
+                  <option>PODCHURCH</option>
+                  <option>HILLSONG</option>                  
+                </select>
+              </div>
+              </div>
+              <div class="mb-4 row align-items-center">
+                <label class="col-md-2 col-form-label fs-sm" for="url-input" >image_addr</label>
+                <div class="col-md-10">
+                  <input class="form-control" type="url" id="" value="https://img.youtube.com/vi/입력내용/0.jpg" name="image_addr">
+                </div>
+              </div>
+              <div class="mb-4 row align-items-center">
+                <label class="col-md-2 col-form-label fs-sm" for="tel-input" >url_addr</label>
+                <div class="col-md-10">
+                  <input class="form-control" type="url" id="" value="" name="url_addr">
+                </div>
+              </div>
+              <div class="mb-4 row align-items-center">
+                <label class="col-md-2 col-form-label fs-sm" for="pass-input" >title</label>
+                <div class="col-md-10">
+                  <input class="form-control" type="text" id="" value="" name="title">
+                </div>
+              </div>
+              <div class="mb-4 row align-items-center">
+                <label class="col-md-2 col-form-label fs-sm" for="pass-input" >content</label>
+                <div class="col-md-10">
+                  <input class="form-control" type="text" id="" value="" name="content">
+                </div>
+              </div>
+              <div class="mb-4 row align-items-center">
+                <label class="col-md-2 col-form-label fs-sm" for="pass-input" >Date</label>
+                <div class="col-md-10">
+                <input type="text" class="form-control" name="media_date" id="dateFormat" value="2023-04-01" data-format='{"date": true, "delimiter": "-", "datePattern": ["Y", "m", "d"]}' placeholder="yyyy-mm-dd">
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary">submit</button>
+            </div>
+        
+
+
+
+    
+          
+          </form>
+      </main>
+    <script type="text/javascript">
+      function go_submit(){
+        
+      }
+    </script>
+
+
+    {% endblock %}

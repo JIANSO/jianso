@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Silicon UI Kit | Forms</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Bright Night">
+    <meta name="keywords" content="christian">
+    <meta name="author" content="anne">
+
+    <!-- Viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Favicon and Touch Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/favicon/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='assets/favicon/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/favicon/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='assets/favicon/site.webmanifest') }}">
+    <link rel="mask-icon" href="{{ url_for('static', filename='assets/favicon/safari-pinned-tab.svg') }}" color="#6366f1">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/favicon/favicon.ico') }}">
+    <meta name="msapplication-TileColor" content="#080032">
+    <meta name="msapplication-config" content="{{ url_for('static', filename='assets/favicon/browserconfig.xml') }}">
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Vendor Styles -->
+    <link rel="stylesheet" media="screen" href="{{ url_for('static', filename='assets/vendor/boxicons/css/boxicons.min.css') }}"/>
+    <link rel="stylesheet" media="screen" href="{{ url_for('static', filename='assets/vendor/swiper/swiper-bundle.min.css') }}"/>
+    <link rel="stylesheet" media="screen" href="{{ url_for('static', filename='assets/vendor/nouislider/dist/nouislider.min.css') }}"/>
+    <link rel="stylesheet" media="screen" href="{{ url_for('static', filename='assets/vendor/prismjs/themes/prism.css') }}"/>
+    <link rel="stylesheet" media="screen" href="{{ url_for('static', filename='assets/vendor/prismjs/plugins/toolbar/prism-toolbar.css') }}"/>
+    <link rel="stylesheet" media="screen" href="{{ url_for('static', filename='assets/vendor/prismjs/plugins/line-numbers/prism-line-numbers.css') }}"/>
+
+    <!-- Main Theme Styles + Bootstrap -->
+    <link rel="stylesheet" media="screen" href="{{ url_for('static', filename='assets/css/theme.min.css') }}">
+
+    <!-- Theme mode -->
+    <script>
+      let mode = window.localStorage.getItem('mode'),
+          root = document.getElementsByTagName('html')[0];
+      if (mode !== null && mode === 'dark') {
+        root.classList.add('dark-mode');
+      } else {
+        root.classList.remove('dark-mode');
+      }
+    </script>
+  </head>
+
+
+  <!-- Body -->
+  <body data-bs-spy="scroll" data-bs-target="#jumpToNav" tabindex="0">
+
+        
+    <!-- Navbar -->
+    <header class="header navbar navbar-expand bg-light border-bottom border-light shadow fixed-top" data-scroll-header>
+      <div class="container-fluid pe-lg-4">
+        <div class="d-flex align-items-center">
+          <a href="typography.html" class="navbar-brand flex-shrink-0 py-1 py-lg-2">
+            <img src="{{ url_for('static', filename='assets/img/logo.svg') }}" width="47" alt="Bright Night">
+            Bright Night
+          </a>
+          <span class="badge bg-warning">UI Kit</span>
+        </div>
+        <div class="d-flex align-items-center w-100">
+       
+          <button type="button" class="navbar-toggler d-block d-lg-none ms-auto me-4" data-bs-toggle="offcanvas" data-bs-target="#componentsNav" aria-controls="componentsNav" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="form-check form-switch mode-switch pe-lg-1 ms-lg-auto" data-bs-toggle="mode">
+            <input type="checkbox" class="form-check-input" id="theme-mode">
+            <label class="form-check-label d-none d-sm-block d-lg-none d-xl-block" for="theme-mode">Light</label>
+            <label class="form-check-label d-none d-sm-block d-lg-none d-xl-block" for="theme-mode">Dark</label>
+          </div>
+          
+        </div>
+      </div>
+    </header>
+
+
+    <!-- Main sidebar navigation -->
+    <aside class="dark-mode">
+      <div id="componentsNav" class="offcanvas-lg offcanvas-start d-flex flex-column position-fixed top-0 start-0 vh-100 bg-dark border-end-lg" style="width: 21rem; z-index: 1045;">
+        <div class="offcanvas-header d-none d-lg-flex justify-content-start">
+          <a href="typography.html" class="navbar-brand text-dark d-none d-lg-flex py-0">          
+            Bright Night
+          </a>
+         
+        </div>
+        <div class="offcanvas-header d-block d-lg-none border-bottom">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="d-lg-none mb-0">Menu</h5>
+            <button type="button" class="btn-close d-lg-none" data-bs-dismiss="offcanvas" data-bs-target="#componentsNav"></button>
+          </div>
+          
+        </div>
+        <div class="offcanvas-body swiper scrollbar-hover overflow-hidden w-100 p-4" data-swiper-options='{
+          "direction": "vertical",
+          "slidesPerView": "auto",
+          "freeMode": true,
+          "scrollbar": {
+            "el": ".swiper-scrollbar"
+          },
+          "mousewheel": true
+        }'>
+          <div class="swiper-wrapper">
+            <div class="swiper-slide h-auto">
+              <h3 class="fs-lg">Content</h3>
+              <div class="list-group list-group-flush border-bottom pb-3 mb-4 mx-n4">
+                <a href="#" class="list-group-item list-group-item-action border-0 py-2 px-4">YouTube Library Manage</a>
+              
+              </div>
+             
+             
+            </div>
+          </div>
+          <div class="swiper-scrollbar end-0"></div>
+        </div>
+        <div class="offcanvas-header border-top">
+         
+        </div>
+      </div>
+    </aside>
+
+
+    <!-- Page container -->
+    
+    {% block content %}       
+    {% endblock %}
+
+
+   
+
+
+    <!-- Back to top button -->
+    <a href="#top" class="btn-scroll-top" data-scroll>
+      <span class="btn-scroll-top-tooltip text-muted fs-sm me-2">Top</span>
+      <i class="btn-scroll-top-icon bx bx-chevron-up"></i>
+    </a>
+
+
+    <!-- Vendor Scripts -->
+    <script src="{{ url_for('static', filename='assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/smooth-scroll/dist/smooth-scroll.polyfills.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/swiper/swiper-bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/nouislider/dist/nouislider.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/cleave.js/dist/cleave.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/prismjs/components/prism-core.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/prismjs/components/prism-markup.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/prismjs/components/prism-clike.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/prismjs/plugins/toolbar/prism-toolbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/prismjs/plugins/line-numbers/prism-line-numbers.min.js') }}"></script>
+
+    <!-- Main Theme Script -->
+    <script src="{{ url_for('static', filename='assets/js/theme.min.js') }}"></script>
+  </body>
+</html>

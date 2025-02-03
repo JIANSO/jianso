@@ -1,0 +1,39 @@
+
+<div class="masonry-grid row row-cols-sm-2 row-cols-1 g-4">
+
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">장애인 활동지원사 전자바우처</h5>
+      <p class="card-text fs-sm text-muted" id="result">
+        
+        안녕하세요? 무엇을 도와드릴까요?
+      </p>
+    </div>
+    <div class="list-group list-group-flush">
+      <a href="#" class="list-group-item list-group-item-action">서비스 시작</a>
+      <a href="#" class="list-group-item list-group-item-action">서비스 관리</a>
+      <a href="#" class="list-group-item list-group-item-action">서비스 종료</a>
+    </div>
+    <div class="card-body">
+      <a href="#" class="btn btn-sm btn-primary">글로 보기</a>
+    </div>
+  </div>
+ 
+  </div> 
+
+  <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+      /*
+      실시간 음성 전송
+      */
+      console.log("====파이썬 서버 시작=====")
+      fetch('/start_recording')
+          .then(response => response.json())
+          .then(data => {
+              document.getElementById('result').innerText = '사용자 음성:: ' + data.result;
+          })
+          .catch(error => console.error('Error:', error));
+    });
+    
+
+  </script>

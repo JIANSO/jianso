@@ -1,0 +1,181 @@
+
+<div class="masonry-grid row row-cols-sm-2 row-cols-1 g-4">
+
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Card title</h5>
+        <p class="card-text fs-sm text-muted">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+      </div>
+      <div class="list-group list-group-flush">
+        <a href="#" class="list-group-item list-group-item-action">Cras justo odio</a>
+        <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>
+        <a href="#" class="list-group-item list-group-item-action">Vestibulum at eros</a>
+      </div>
+      <div class="card-body">
+        <a href="#" class="btn btn-sm btn-primary">Go somewhere</a>
+      </div>
+    </div>
+  
+  
+    
+    <div class="masonry-grid-item col-lg-4 pb-2 pb-lg-3">
+      <article class="card h-100 border-0 shadow-sm mx-2">
+        <h3>Audio Streaming Test</h3>
+        <button id="start">Start Recording</button>
+        <button id="stop">Stop Recording</button>
+    </article>
+    </div>
+  
+  
+      <!-- Item 메인 화면 -->
+      <div class="masonry-grid-item col-lg-4 pb-2 pb-lg-3">
+        <article class="card h-100 border-0 shadow-sm mx-2">
+          <div class="position-relative">
+            <div><button type="button" id="playButton" class="btn btn-primary shadow-primary">재생</button></div>
+            <div><audio id="audioPlayer" controls></audio></div>     
+          </div>
+          <div class="position-relative">
+            <div><button type="button" id="" class="btn btn-primary shadow-primary">다음 화면</button></div>
+          </div>
+          <!--하단-->
+          <div class="card-body py-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span class="fs-sm text-muted">최초 화면</span>
+            </div>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span class="fs-sm text-muted">안녕하세요? 무엇을 도와드릴까요?</span>
+            </div>
+          </div>     
+        </article>
+      </div>
+  
+      <!-- Item -->
+      <div class="masonry-grid-item col-lg-4 pb-2 pb-lg-3">
+        <article class="card h-100 border-0 shadow-sm mx-2">
+          <div class="position-relative">
+            <div><button type="button" id="" class="btn btn-primary shadow-primary">서비스 시작</button></div>
+            <div><button type="button" id="" class="btn btn-primary shadow-primary">서비스 관리</button></div>
+            <div><button type="button" id="" class="btn btn-primary shadow-primary">서비스 종료</button></div>
+          </div>
+           <!--하단-->
+           <div class="card-body py-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span class="fs-sm text-muted">시작화면</span>
+            </div>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span class="fs-sm text-muted">원하시는 서비스 종류를 선택해 주세요.</span>
+              <!--
+              1. 사용자의 음성 발화 채집 / 음성 채집 리스너 
+              2. 사용자의 버튼 클릭 인지
+              -->
+            </div>
+          </div>
+        </article>
+      </div>
+  
+      <!-- Item -->
+      <div class="masonry-grid-item col-lg-4 pb-2 pb-lg-3">
+        <article class="card h-100 border-0 shadow-sm mx-2">
+          <div class="position-relative">
+            사용자 인증 진행 화면 (서비스 시작, 서비스 종료 공통)
+          </div>
+           <!--하단-->
+           <div class="card-body py-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span class="fs-sm text-muted">인증 화면</span>
+            </div>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span class="fs-sm text-muted">인증을 진행합니다.</span>
+              <!--
+              1. 사용자의 음성 발화 채집 / 음성 채집 리스너 
+              2. 사용자의 버튼 클릭 인지
+              -->
+            </div>
+          </div>
+        </article>
+      </div>
+  
+      
+    </div> 
+    <script type="text/javascript">
+      function startRecording() {
+        //연구 후 삭제 예정
+        fetch('/start_recording')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerText = 'Max Amplitude: ' + data.max_amplitude;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+      //최초 화면 음성
+      document.getElementById('playButton').addEventListener('click', function() {
+              fetch('/tts')
+                  .then(response => response.blob())
+                  .then(blob => {
+                      const url = URL.createObjectURL(blob);
+                      const audioPlayer = document.getElementById('audioPlayer');
+                      audioPlayer.src = url;
+                      audioPlayer.play().catch(e => console.error('Error playing audio:', e));
+                  })
+                  .catch(error => console.error('Error fetching audio:', error));
+          });
+  
+    </script>
+    <!-- 실시간 웹소켓 음성 전송 -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            var socket = io(); // 서버와의 Socket.IO 연결 초기화
+  
+            let mediaRecorder;
+            let audioChunks = [];
+  
+            async function startRecording() {
+              /*
+               - 한국어가 깨지는 문제가 있다.
+              */
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+  
+                    mediaRecorder.ondataavailable = function (event) {
+                        if (event.data.size > 0) {
+                            audioChunks.push(event.data);
+                        }
+                    };
+  
+                    mediaRecorder.onstop = function () {
+                      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                      
+                      const reader = new FileReader();
+                      reader.onload = function () {
+                          const buffer = this.result;
+                          const bufferLength = buffer.byteLength;
+                          const remainder = bufferLength % 2;
+                          if (remainder !== 0) {
+                              console.warn("The buffer length is not aligned. Adjusting the length.");
+                          }
+                          const alignedBuffer = buffer.slice(0, bufferLength - remainder);
+                          socket.emit('audio_data', { audio: alignedBuffer });
+                      };
+                      
+                      reader.readAsArrayBuffer(audioBlob);
+                  };
+  
+                    mediaRecorder.start();
+                } catch (error) {
+                    console.error('Error accessing audio devices.', error);
+                }
+            }
+  
+            function stopRecording() {
+                if (mediaRecorder) {
+                    mediaRecorder.stop(); // Triggers the 'onstop' event
+                }
+            }
+  
+            // Start and stop recording buttons
+            document.getElementById('start').addEventListener('click', startRecording);
+            document.getElementById('stop').addEventListener('click', stopRecording);
+        });
+    </script>

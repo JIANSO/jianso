@@ -1,0 +1,5 @@
+pip install torch
+pip install transformers
+pip install pydub
+
+pip install Flask opencv-python face_recognition

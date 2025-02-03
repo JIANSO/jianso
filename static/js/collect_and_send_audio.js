@@ -1,7 +1,8 @@
 async function collectAndSendAudio() {
 /*
-음성을 모아서 파이썬 서버에 전송하는 기술
-
+Description :
+자바스크립트에서 음성을 3초 정도 모아서 
+파이썬 서버에 전송하는 기술 연구.
 */
 
     let url = '/get_audio'

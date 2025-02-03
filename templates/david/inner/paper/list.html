@@ -3,7 +3,7 @@
 
   <div class="masonry-grid-item col-lg-4 pb-2 pb-lg-3">
     <article class="card h-100 border-0 shadow-sm mx-2">
-      <h1>Audio Streaming Test</h1>
+      <h3>Audio Streaming Test</h3>
       <button id="start">Start Recording</button>
       <button id="stop">Stop Recording</button>
   </article>
@@ -81,7 +81,15 @@
     
   </div> 
   <script type="text/javascript">
-
+    function startRecording() {
+      //연구 후 삭제 예정
+      fetch('/start_recording')
+          .then(response => response.json())
+          .then(data => {
+              document.getElementById('result').innerText = 'Max Amplitude: ' + data.max_amplitude;
+          })
+          .catch(error => console.error('Error:', error));
+      }
     //최초 화면 음성
     document.getElementById('playButton').addEventListener('click', function() {
             fetch('/tts')

@@ -1,5 +1,8 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
-
+/*
+자바스크립트에서 웹 소켓으로 실시간으로 사용자 음성을 수집하여 
+클라이언트 종료 버튼을 누르면 음성을 보내는 기술 연구
+*/
     document.addEventListener('DOMContentLoaded', function () {
         var socket = io(); // 서버와의 Socket.IO 연결 초기화
 

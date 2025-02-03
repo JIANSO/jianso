@@ -23,7 +23,9 @@ class AudioProcessor:
         else:
             device = "cpu"
         # Whisper 모델 로드
-        self.transcriber = pipeline(model="openai/whisper-large", task="automatic-speech-recognition", device=device)
+        self.transcriber = pipeline(model="openai/whisper-large", 
+                                    task="automatic-speech-recognition", 
+                                    device=device)
         self.format = pyaudio.paInt16
         self.channels = 1
         self.rate = 16000  # 샘플링 레이트 설정

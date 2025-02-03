@@ -30,7 +30,12 @@ def home():
     
     return render_template("/index.html")
 
-
+############################################################
+# stt 음성 file 처리
+#
+############################################################
+from pydub import AudioSegment
+import numpy as np
 @app.route('/get_audio', methods=['POST'])
 def get_audio():
     """
@@ -41,28 +46,22 @@ def get_audio():
 
     audio_file = request.files['audioFile']  # input type="file"의 name과 일치해야 함
     
-    frames = process_audio_file(audio_file, 16000)
-    return "파일을 받았습니다!"
-
-from pydub import AudioSegment
-import numpy as np
-def process_audio_file(audio_file, rate):
-    """
-    2025.02.02
-    클라이언트 음성 파일 처리
-    """
-   
     # 오디오 파일을 AudioSegment 객체로 로드
     audio_segment = AudioSegment.from_file(audio_file)
     
     # 주어진 샘플링 레이트로 오디오를 변환
-    audio_segment = audio_segment.set_frame_rate(rate)
+    audio_segment = audio_segment.set_frame_rate(16000)
     
     # numpy 배열로 데이터 추출
     samples = np.array(audio_segment.get_array_of_samples(), dtype=np.int16)
     
+    audio_float = samples.astype(np.float32) / 32768  # 정규화
+    
     from API.sst.whisper import AudioProcessor
-    AudioProcessor.get_client_audio(samples)
+    
+    AudioProcessor.get_client_audio(audio_float)
+    
+    return "파일을 받았습니다!"
 
 
 from gtts import gTTS
@@ -80,6 +79,11 @@ def tts():
 
     return send_file("hello.mp3", as_attachment=True)
 
+############################################################
+# socketio
+#
+############################################################
+
 @socketio.on('connect')
 def test_connect():
     print('Client connected')
@@ -92,7 +96,6 @@ from transformers import pipeline
 import torch
 @socketio.on('audio_data')
 def handle_audio(data):
-    print("======handle_audio 함수 시작")
     
     audio_data = data['audio']
     
@@ -100,11 +103,9 @@ def handle_audio(data):
         print("Received audio data length is not a multiple of element size. Adjusting.")
         audio_data = audio_data[:-1]  # 마지막 바이트를 잘라내어 조정
 
-    audio_array = np.frombuffer(audio_data, dtype=np.int16)
-    
+    audio_array = np.frombuffer(audio_data, dtype=np.int16) 
     audio_float = audio_array.astype(np.float32) / 32768  # -1.0 ~ 1.0 범위로 정규화
 
-    print("======위스퍼 시작")
     # Whisper 모델에 전달
     try:
         # GPU가 사용 가능한지 확인

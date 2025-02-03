@@ -3,6 +3,7 @@ import numpy as np
 import queue
 from transformers import pipeline
 import webrtcvad
+import torch
 
 """
 2025.01.23
@@ -14,14 +15,15 @@ import webrtcvad
 5. PyAudio 로 실시간 음성인식. 위스퍼는 원래 mp3를 번역하는 것에 더 특화 되었다고 함.
 
 """
-
-# Whisper 모델 로드
-transcriber = pipeline(model="openai/whisper-large", task="automatic-speech-recognition")
-
 class AudioProcessor:
     def __init__(self):
+        # GPU가 사용 가능한지 확인
+        if torch.cuda.is_available():
+            device = "cuda"
+        else:
+            device = "cpu"
         # Whisper 모델 로드
-        self.transcriber = pipeline(model="openai/whisper-large", task="automatic-speech-recognition")
+        self.transcriber = pipeline(model="openai/whisper-large", task="automatic-speech-recognition", device=device)
         self.format = pyaudio.paInt16
         self.channels = 1
         self.rate = 16000  # 샘플링 레이트 설정
@@ -33,8 +35,6 @@ class AudioProcessor:
         audio = pyaudio.PyAudio()
         stream = audio.open(format=self.format, channels=self.channels, rate=self.rate, input=True, frames_per_buffer=self.chunk)
         vad = webrtcvad.Vad(1)  # VAD 모드 설정 (0~3, 3이 가장 엄격)
-
-        print("=====Recording...")
         frames = []
         
         silence_frames = 0
@@ -44,10 +44,9 @@ class AudioProcessor:
             frames.append(frame)
             
             if is_speech:
-                print("...발화 진행중")
                 silence_frames = 0
             else:
-                print("...발화 없음")
+            
                 if silence_frames > 100:  # ~초간 음성이 없으면 중단
                     # 리소스 정리
                     stream.stop_stream()
@@ -60,35 +59,34 @@ class AudioProcessor:
         q.put(frames)  # 전체 녹음된 프레임을 큐에 추가
         q.put(None)  # 녹음 종료를 알림
 
+
     def process_audio(self, q):
         frames = self.audio_queue.get()
         if frames is None:
             return
 
-        print(".............process_audio")
         buffer = np.concatenate([np.frombuffer(frame, dtype=np.int16) for frame in frames])  # 프레임들을 하나의 배열로 합침
         audio_float = buffer.astype(np.float32) / 32768  # 정규화
         try:
-            result = transcriber({"raw": audio_float, "sampling_rate": self.rate})
+            result = self.transcriber({"raw": audio_float, "sampling_rate": self.rate})
             if result['text']:
-                print("=====Transcription:", result['text'])
+                print("=====STT 결과::", result['text'])
         
         except Exception as e:
             print(f"Error processing audio: {e}")
 
 
-    def get_client_audio(self, sample):
+    def get_client_audio(self, audio_float):
         """
         자바스크립트에서 받은 음성 파일 처리
         문제가 생겼다. 매우 느리다.
+        TODO 내일 cuda로 다시 돌려보기
         """
-        audio_float = sample.astype(np.float32) / 32768  # 정규화
-
-        print("======get_client_audio 함수 실행 ::", audio_float)
+        
         try:
-            result = transcriber({"raw": audio_float, "sampling_rate": self.rate})
+            result = self.transcriber({"raw": audio_float, "sampling_rate": self.rate})
             if result['text']:
-                print("=====클라이언트 음성 결과:", result['text'])
+                print("=====STT 결과:", result['text'])
         
         except Exception as e:
             print(f"Error processing audio: {e}")

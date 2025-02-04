@@ -1,7 +1,7 @@
 
 <div class="masonry-grid row row-cols-sm-2 row-cols-1 g-4">
   <div class="mobile-frame">
-    <div class="inner-content">
+    <div class="inner-content" id="inner-content">
       
       <div class="p-3">
         <div class="mb-2">
@@ -26,49 +26,19 @@
       </div>
       <div class="p-3">
 
-        <p class="" id="voice">
+        <p class="m-1" id="voice">
           안녕하세요? 무엇을 도와드릴까요?
         </p>
 
-        <div>
-          <button type="button" class="btn btn-secondary pe-none">
+        <div class="m-1">
             <span class="spinner-grow spinner-grow-sm me-2" role="status" aria-hidden="true"></span>
-            음성 지원
-          </button>
         </div>
         
-        <p class="" id="result">
+        <p class="m-1" id="result">
           사용자 발화 결과
         </p>
       </div>
+      <!-- -->
     </div>
   </div>
 </div> 
-
-<script src="/static/script.js"></script>
-  <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function () {
-      /*
-      실시간 음성 전송
-      */
-      console.log("====파이썬 서버 시작=====")
-      fetch('/start_recording')
-          .then(response => response.json())
-          .then(data => {
-              document.getElementById('result').innerText = '사용자 음성:: ' + data.result;
-          })
-          .catch(error => console.error('Error:', error));
-    });
-
-    function go_next_page(this){
-      /* page 이름 넘기기 */
-      fetch('/get_inner')
-      .then(response => response.text())
-      .then(html => {
-        document.getElementById('content').innerHTML = html;
-      })
-      .catch(error => console.error('Error loading the content:', error));
-    }
-    
-
-  </script>

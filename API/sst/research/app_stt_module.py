@@ -40,7 +40,7 @@ def get_audio():
     
     audio_float = samples.astype(np.float32) / 32768  # 정규화
     
-    from API.sst.whisper import AudioProcessor
+    from API.sst.research.whisper import AudioProcessor
     
     AudioProcessor.get_client_audio(audio_float)
     

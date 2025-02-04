@@ -11,7 +11,9 @@ def inner_main():
    
     return render_template("david/paper/inner/inner_main.html")
 
-@get_page.route('/start')
-def inner_start():
+@get_page.route('/get_inner_start', methods=['GET'])
+def get_inner_start():
    
-    return render_template("david/paper/inner/inner_start.html")
+    type = request.args.get('referer', 'default_value')
+    
+    return render_template("david/paper/inner/inner_start.html", referer=type)

@@ -11,9 +11,16 @@ def inner_main():
    
     return render_template("david/paper/inner/inner_main.html")
 
-@get_page.route('/get_inner_start', methods=['GET'])
-def get_inner_start():
+@get_page.route('/get_next_page', methods=['GET'])
+def get_next_page():
    
-    type = request.args.get('referer', 'default_value')
+    next = request.args.get('next', 'default_value')
     
-    return render_template("david/paper/inner/inner_start.html", referer=type)
+    return render_template("david/paper/inner/inner_"+next+".html")
+
+@get_page.route('/get_prev_page', methods=['GET'])
+def get_prev_page():
+   
+    prev = request.args.get('prev', 'default_value')
+    
+    return render_template("david/paper/inner/inner_"+prev+".html")

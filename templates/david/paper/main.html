@@ -3,12 +3,13 @@
 맨 처음 시작 화면. 완료
 inner가 계속 변경될 예정.
 누르면 소리 나오도록 조작하기.
+다음 단계 : inner_start.html
 -->
 <div class="masonry-grid row row-cols-sm-2 row-cols-1 g-4">
   <div class="mobile-frame">
     <div class="inner-content" id="inner-content">
       <!--changable-->
-      <div id="inner_main" class="d-flex flex-column justify-content-center bg-info h-100" >
+      <a href="#" id="inner_main" onclick="get_inner_page(next='start')" class="d-flex flex-column justify-content-center bg-info h-100" >
         <div class="d-flex flex-column justify-content-center align-items-center" style="height: 90%;">
           <div class="text-white mb-2">나누는 사랑, 커지는 희망</div>
           <div class="mb-2"><h1 class="text-white">전자바우처<h1></div>
@@ -19,25 +20,37 @@ inner가 계속 변경될 예정.
           <img src="static/david/img/h_logo_1.png" style="width: 30%;" alt="image">
           <img src="static/david/img/logo_wh.svg" style="width: 30%;" alt="image">
         </div>
-      </div>
-
+      </a>
+      <!--changable-->
     </div>
   </div>
 </div> 
 
 <script type="text/javascript">
   document.addEventListener('DOMContentLoaded', function () {
-    const innerMain = document.getElementById('inner_main');
-  
-    innerMain.addEventListener('click', function() {
-      fetch('get_page/get_inner_start?referer='+'main')
+    //get_inner_page(next='start', btn_id='inner_main');
+  });
+
+  function get_inner_page(next){
+      console.log("====get_inner_page===")
+      fetch('get_page/get_next_page?next='+next)
         .then(response => response.text())  // 서버로부터 HTML을 텍스트로 받아옵니다.
         .then(html => {
           document.getElementById('inner-content').innerHTML = html;  // 받아온 HTML로 body의 내용을 교체합니다.
 
-          //referer 등록 필요
         })
         .catch(error => console.error('Error loading the page: ', error));
-    });
-  });
+  
+  }
+
+  function get_prev_page(prev){
+      console.log("====get_prev_page===")
+      fetch('get_page/get_prev_page?prev='+prev)
+        .then(response => response.text())  // 서버로부터 HTML을 텍스트로 받아옵니다.
+        .then(html => {
+          document.getElementById('inner-content').innerHTML = html;  // 받아온 HTML로 body의 내용을 교체합니다.
+        })
+        .catch(error => console.error('Error loading the page: ', error));
+ 
+  }
 </script>

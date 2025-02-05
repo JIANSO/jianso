@@ -3,6 +3,7 @@
 누르면 소리 나오도록 조작하기.
 시작 화면.
 완료.
+이전 단계 : main.html
 -->
 <div id="inner_start" class="h-100" >
   <div class="pt-3 pb-1 bg-warning text-center">
@@ -10,8 +11,8 @@
   </div>
   <!-- -->
   <div class="p-3">
-    <button type="button" class="btn btn-secondary">이전 단계</button>
-    <p>Previous page: {{ referer }}</p>
+    <button type="button" id="click_button" class="btn btn-secondary" onclick="get_prev_page(prev='main')">이전 단계</button>
+    
   </div>
   <div class="p-3">
     <!-- Numbered list group -->

@@ -110,44 +110,6 @@
         .catch(error => console.error('Error:', error));
   }
 
-  function get_inner_page(sidebar_url){
-    /* sidebar click */
-      fetch(sidebar_url, {
-        headers : {'Content-Type' : 'text/html'}
-        , method : 'get'
-      })
-      .then((response) => {
-
-          if(!response.ok){
-            throw new Error(`HTTP error! status: ${response.status}`)
-          }
-          return response.text()
-        }
-      )
-      .then( (data) => {
-        document.getElementById('page_wrapper').innerHTML = data;
-      }
-
-      )
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-
-  }
-
-  function go_next_page(){
-    /* 
-    page 이름 넘기기.
-    다른 함수 쓰고 삭제할 듯.
-    */
-    fetch('/get_inner')
-    .then(response => response.text())
-    .then(html => {
-      document.getElementById('content').innerHTML = html;
-    })
-    .catch(error => console.error('Error loading the content:', error));
-  }
-  
 
 </script>
   <!-- Back to top button -->

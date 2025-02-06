@@ -2,8 +2,6 @@ from flask import jsonify
 import numpy as np
 import pyaudio
 import webrtcvad
-from transformers import pipeline
-import torch
 
 """
 [최종본]
@@ -24,15 +22,7 @@ openai/whisper-medium이나 openai/whisper-small 모델을 사용할 수 있습�
 라미터 설정을 사용하여 처리 속도를 개선할 수 있습니다. 
 예를 들어, num_beams나 early_stopping 같은 추론 파라미터를 조절하여 더 빠른 결과를 얻을 수 있습니다.
 """
-if torch.cuda.is_available():
-    device = "cuda"
-else:
-    device = "cpu"
-# Whisper 모델 로드
-TRANSCRIBER = pipeline(model="openai/whisper-medium", 
-                    task="automatic-speech-recognition", 
-                    device=device
-                    )
+
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
@@ -40,7 +30,7 @@ RATE = 16000  # 샘플링 레이트 설정
 CHUNK = 320
 RECORD_SECONDS = 5
 
-def sst_module () :
+def sst_module (TRANSCRIBER) :
     frame_duration = 20  # 프레임 길이 (ms)
     frame_size = int(RATE * frame_duration / 1000)  # 프레임 크기 계산
     audio = pyaudio.PyAudio()
@@ -53,23 +43,24 @@ def sst_module () :
 
     frames = []
     silence_frames = 0
-    speeking_frames = 0
+    speaking_frames = 0
     audio_data_collected = False
     print("========읽기 시작 :: ")
+    result_text = ""
     try:
         while True:
             frame = stream.read(frame_size, exception_on_overflow=False)  # 20 ms의 오디오 프레임 읽기
             is_speech = vad.is_speech(frame, RATE)  # 현재 프레임에서 음성이 있는지 확인
             frames.append(frame)
             if is_speech:     
-                print("========발화 o :: ", speeking_frames)
+                print("========발화 o :: ", speaking_frames)
                 silence_frames = 0
-                speeking_frames += 1
+                speaking_frames += 1
                 audio_data_collected = True
             else :
                 print("========발화 x :: ", silence_frames)
                 silence_frames += 1
-                if speeking_frames > 20 and audio_data_collected and silence_frames > 30:  # 충분한 양의 음성 데이터 후 1초 이상의 침묵이 있으면 처리 시작
+                if speaking_frames > 10 and audio_data_collected and silence_frames > 15:  # 충분한 양의 음성 데이터 후 1초 이상의 침묵이 있으면 처리 시작
                     print("========출력 시작 :: ")
                     buffer = np.concatenate([np.frombuffer(frame, dtype=np.int16) for frame in frames])  # 프레임들을 하나의 배열로 합침
                     audio_float = buffer.astype(np.float32) / 32768  # 정규화
@@ -78,9 +69,11 @@ def sst_module () :
                     
                     if result['text']:
                         print("=====STT 결과::", result['text'])
+                        result_text = result['text']
                         break
                 elif silence_frames > 100 :            
                     print("=====음성 없음 및 종료::")
+                    result_text = "음성 없음 및 종료"
                     break
                    
        
@@ -94,4 +87,4 @@ def sst_module () :
         stream.close()
         audio.terminate()
 
-    return result
+    return result_text

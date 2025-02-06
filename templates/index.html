@@ -41,7 +41,7 @@
 
       .spinner-grow {
         /*스피너 수정*/
-        --si-spinner-animation-speed: 1.3s;
+        --si-spinner-animation-speed: 1.5s;
         --si-spinner-width: 3rem;
         --si-spinner-height: 3rem;
       }
@@ -92,24 +92,7 @@
       
   });
 
-  function start_recording(){
-    /*
-    실시간 음성 전송
-    */
-    console.log("====파이썬 서버 시작=====")
-    fetch('/start_recording')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('result').innerText = '사용자 음성:: ' + data.result;
-
-            // llm 통과 후 다음 페이지 넘어갈 예정
-            // 서버에서 처리 후 1,2,3 에 따라 페이지 넘길 예정 
-
-            
-        })
-        .catch(error => console.error('Error:', error));
-  }
-
+  
 
 </script>
   <!-- Back to top button -->

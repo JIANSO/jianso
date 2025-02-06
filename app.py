@@ -1,5 +1,25 @@
 from flask import Flask, render_template,jsonify
 from API.get_page import get_page
+from API.sst import sst
+from API.sst.research import no_transcriber_whisper
+import torch
+from transformers import pipeline
+
+if torch.cuda.is_available():
+    device = "cuda"
+else:
+    device = "cpu"
+"""
+속도 개선
+pipeline을 사용하는 경우
+whipser를 그대로 불러오는 경우
+"""
+print("device ::", device)
+# Whisper 모델 로드
+TRANSCRIBER = pipeline(model="openai/whisper-medium", 
+                    task="automatic-speech-recognition", 
+                    device=device
+                    )
 
 app = Flask(__name__)
 app.register_blueprint(get_page, url_prefix='/get_page')
@@ -26,10 +46,25 @@ def home():
 
 @app.route('/start_recording')
 def start_recording():
-    from API.sst import sst
-    result = sst.sst_module()
+    
 
-    return jsonify({"result": result['text']})
+    #audio_text = sst.sst_module(TRANSCRIBER)
+    #아래 함수 속도 때문에 테스트 중
+    print("===app.py start_recording===")
+    audio_text = no_transcriber_whisper.sst_module()
+    return_result = "없음"
+
+    if "시작" in audio_text :
+        return_result = "시작"
+    elif "종료" in audio_text :
+        return_result = "종료"
+    elif "관리" in audio_text :
+        return_result = "관리"
+    else :
+        return_result = "없음"
+
+
+    return jsonify({"return_result": return_result, "audio_text" : audio_text })
 
 @app.errorhandler(Exception)
 def handle_error(error):

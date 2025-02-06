@@ -8,6 +8,7 @@ inner가 계속 변경될 예정.
 <div class="masonry-grid row row-cols-sm-2 row-cols-1 g-4">
   <div class="mobile-frame">
     <div class="inner-content" id="inner-content">
+      
       <!--changable-->
       <a href="#" id="inner_main" onclick="get_inner_page(next='start')" class="d-flex flex-column justify-content-center bg-info h-100" >
         <div class="d-flex flex-column justify-content-center align-items-center" style="height: 90%;">
@@ -15,42 +16,62 @@ inner가 계속 변경될 예정.
           <div class="mb-2"><h1 class="text-white">전자바우처<h1></div>
           <div class=""><h6 class="text-white">화면을 터치하세요</h6></div>
         </div>
-        <div class="d-flex align-items-center bg-secondary" style="height: 10%;justify-content: space-around">
+        <div class="d-flex align-items-center bg-secondary" 
+        style="height: 10%;justify-content: space-around">
   
           <img src="static/david/img/h_logo_1.png" style="width: 30%;" alt="image">
           <img src="static/david/img/logo_wh.svg" style="width: 30%;" alt="image">
         </div>
       </a>
       <!--changable-->
+
     </div>
   </div>
 </div> 
 
 <script type="text/javascript">
   document.addEventListener('DOMContentLoaded', function () {
-    //get_inner_page(next='start', btn_id='inner_main');
+   
   });
 
   function get_inner_page(next){
       console.log("====get_inner_page===")
       fetch('get_page/get_next_page?next='+next)
-        .then(response => response.text())  // 서버로부터 HTML을 텍스트로 받아옵니다.
+        .then(response => response.text())  
         .then(html => {
-          document.getElementById('inner-content').innerHTML = html;  // 받아온 HTML로 body의 내용을 교체합니다.
-
+          document.getElementById('inner-content').innerHTML = html;
+          //1초 후 시작
+          start_recording();
         })
         .catch(error => console.error('Error loading the page: ', error));
-  
   }
 
   function get_prev_page(prev){
       console.log("====get_prev_page===")
       fetch('get_page/get_prev_page?prev='+prev)
-        .then(response => response.text())  // 서버로부터 HTML을 텍스트로 받아옵니다.
+        .then(response => response.text())  
         .then(html => {
-          document.getElementById('inner-content').innerHTML = html;  // 받아온 HTML로 body의 내용을 교체합니다.
+          document.getElementById('inner-content').innerHTML = html;
+          //start_recording();
         })
         .catch(error => console.error('Error loading the page: ', error));
- 
   }
+
+  function start_recording(){
+    /*
+    실시간 음성 전송
+    
+    */
+    console.log("====파이썬 서버 시작=====")
+    fetch('/start_recording')
+        .then(response => response.json())
+        .then(data => {
+            alert('페이지:: ' + data.return_result + '\n사용자 음성:: ' + data.audio_text);
+
+            // llm 통과 후 다음 페이지 넘어갈 예정
+            // 서버에서 처리 후 1,2,3 에 따라 페이지 넘길 예정 
+        })
+        .catch(error => console.error('Error:', error));
+  }
+
 </script>

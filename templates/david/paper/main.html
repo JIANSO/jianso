@@ -41,7 +41,18 @@ inner가 계속 변경될 예정.
         .then(html => {
           document.getElementById('inner-content').innerHTML = html;
           //1초 후 시작
-          start_recording();
+          // TODO: next에 따라서 start_recoding을 하고 안하고 결정하기.
+          if(next == 'start'){
+            //서비스 시작
+            debugger
+            start_recording();
+          }else if(next == 'recognition')
+          {
+            //서비스 관리
+            debugger
+            camera_stream();
+          }
+          
         })
         .catch(error => console.error('Error loading the page: ', error));
   }
@@ -53,14 +64,14 @@ inner가 계속 변경될 예정.
         .then(html => {
           document.getElementById('inner-content').innerHTML = html;
           //start_recording();
+          stopCamera();
         })
         .catch(error => console.error('Error loading the page: ', error));
   }
 
   function start_recording(){
     /*
-    실시간 음성 전송
-    
+    실시간 음성 인식
     */
     console.log("====파이썬 서버 시작=====")
     fetch('/start_recording')
@@ -70,8 +81,51 @@ inner가 계속 변경될 예정.
 
             // llm 통과 후 다음 페이지 넘어갈 예정
             // 서버에서 처리 후 1,2,3 에 따라 페이지 넘길 예정 
+            if(data.return_result !== 0){
+              get_inner_page(data.return_result);
+            }
+           
+            stopCamera();
         })
         .catch(error => console.error('Error:', error));
+  }
+
+  function camera_stream(){
+    let video = document.getElementById('video');
+    // 웹 카메라 시작
+    if (navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                video.srcObject = stream;
+                camera_recognition();
+            })
+            .catch(function(error) {
+                console.error("===카메라 접근에 실패했습니다:", error);
+            });
+    } else {
+        alert('===getUserMedia를 지원하지 않는 브라우저입니다.');
+    }
+  }
+
+  function camera_recognition(){
+    console.log("====camera_recognition=====")
+    fetch('/start_recording')
+        .then(response => response.json())
+        .then(data => {
+            alert('결과:: ' + data.return_result);
+
+            stopCamera()
+        })
+        .catch(error => console.error('Error:', error));
+  }
+
+  // 카메라 종료
+  function stopCamera() {
+     
+    document.getElementById('video').srcObject.getTracks().forEach(function(track) {
+          track.stop();
+      });
+   
   }
 
 </script>

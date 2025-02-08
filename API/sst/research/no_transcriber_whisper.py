@@ -8,8 +8,8 @@ from pydub import AudioSegment
 import torchaudio
 
 # 모델 및 프로세서 로드
-model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-medium")
-processor = WhisperProcessor.from_pretrained("openai/whisper-medium")
+model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-large-v3-turbo")
+processor = WhisperProcessor.from_pretrained("openai/whisper-large-v3-turbo")
 
 if torch.cuda.is_available():
     model = model.cuda()

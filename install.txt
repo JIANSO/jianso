@@ -2,4 +2,6 @@ pip install torch
 pip install transformers
 pip install pydub
 
+brew install cmake
 pip install Flask opencv-python face_recognition
+pip install face_recognition

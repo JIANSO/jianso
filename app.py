@@ -1,7 +1,7 @@
 from flask import Flask, render_template,jsonify
 from API.get_page import get_page
 from API.sst import sst
-from API.sst.research import no_transcriber_whisper
+from API.recognition import cv2_exe
 import torch
 from transformers import pipeline
 
@@ -9,6 +9,10 @@ if torch.cuda.is_available():
     device = "cuda"
 else:
     device = "cpu"
+
+if torch.backends.mps.is_available():
+    device = "mps"  # Apple Metal Performance Shaders
+
 """
 속도 개선
 pipeline을 사용하는 경우
@@ -16,7 +20,7 @@ whipser를 그대로 불러오는 경우
 """
 print("device ::", device)
 # Whisper 모델 로드
-TRANSCRIBER = pipeline(model="openai/whisper-medium", 
+TRANSCRIBER = pipeline(model="openai/whisper-large-v3-turbo", 
                     task="automatic-speech-recognition", 
                     device=device
                     )
@@ -46,25 +50,27 @@ def home():
 
 @app.route('/start_recording')
 def start_recording():
-    
-
-    #audio_text = sst.sst_module(TRANSCRIBER)
+    audio_text = sst.sst_module(TRANSCRIBER)
     #아래 함수 속도 때문에 테스트 중
     print("===app.py start_recording===")
-    audio_text = no_transcriber_whisper.sst_module()
+    #audio_text = no_transcriber_whisper.sst_module()
     return_result = "없음"
-
     if "시작" in audio_text :
-        return_result = "시작"
+        return_result = "start"
     elif "종료" in audio_text :
-        return_result = "종료"
+        return_result = "end"
     elif "관리" in audio_text :
-        return_result = "관리"
+        return_result = "recognition"
     else :
-        return_result = "없음"
-
-
+        return_result = 0
     return jsonify({"return_result": return_result, "audio_text" : audio_text })
+
+@app.route('/face_recognition')
+def face_recognition():
+    return_result = cv2_exe.generate_frames()
+    print("===return_result ::", return_result)
+    
+    return jsonify({"return_result": return_result })
 
 @app.errorhandler(Exception)
 def handle_error(error):

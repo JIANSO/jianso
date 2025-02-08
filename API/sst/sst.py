@@ -21,70 +21,96 @@ openai/whisper-medium이나 openai/whisper-small 모델을 사용할 수 있습�
 최적화된 설정 사용: 모델 호출 시에 최적화된 파
 라미터 설정을 사용하여 처리 속도를 개선할 수 있습니다. 
 예를 들어, num_beams나 early_stopping 같은 추론 파라미터를 조절하여 더 빠른 결과를 얻을 수 있습니다.
-"""
-
 
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 16000  # 샘플링 레이트 설정
 CHUNK = 320
 RECORD_SECONDS = 5
+STREAM = None
+AUDIO = None
+"""
 
-def sst_module (TRANSCRIBER) :
-    frame_duration = 20  # 프레임 길이 (ms)
-    frame_size = int(RATE * frame_duration / 1000)  # 프레임 크기 계산
-    audio = pyaudio.PyAudio()
-    stream = audio.open(format=FORMAT, 
-                        channels=CHANNELS, 
-                        rate=RATE, 
-                        input=True, 
-                        frames_per_buffer=frame_size)
-    vad = webrtcvad.Vad(3)  # VAD 모드 설정 (0~3, 3이 가장 엄격)
 
-    frames = []
-    silence_frames = 0
-    speaking_frames = 0
-    audio_data_collected = False
-    print("========읽기 시작 :: ")
-    result_text = ""
-    try:
-        while True:
-            frame = stream.read(frame_size, exception_on_overflow=False)  # 20 ms의 오디오 프레임 읽기
-            is_speech = vad.is_speech(frame, RATE)  # 현재 프레임에서 음성이 있는지 확인
-            frames.append(frame)
-            if is_speech:     
-                print("========발화 o :: ", speaking_frames)
-                silence_frames = 0
-                speaking_frames += 1
-                audio_data_collected = True
-            else :
-                print("========발화 x :: ", silence_frames)
-                silence_frames += 1
-                if speaking_frames > 10 and audio_data_collected and silence_frames > 15:  # 충분한 양의 음성 데이터 후 1초 이상의 침묵이 있으면 처리 시작
-                    print("========출력 시작 :: ")
-                    buffer = np.concatenate([np.frombuffer(frame, dtype=np.int16) for frame in frames])  # 프레임들을 하나의 배열로 합침
-                    audio_float = buffer.astype(np.float32) / 32768  # 정규화
-                    result = TRANSCRIBER({"raw": audio_float, 
-                                            "sampling_rate": RATE, "language":"ko"})
-                    
-                    if result['text']:
-                        print("=====STT 결과::", result['text'])
-                        result_text = result['text']
+class audio_stream:
+    def __init__(self):
+        self.audio = pyaudio.PyAudio()
+        self.stream = None
+        self.format = pyaudio.paInt16
+        self.channels = 1
+        self.rate = 16000  # 샘플링 레이트 설정
+        self.chunk = 320
+        self.is_active = False
+
+    def stream_start(self):
+        if not self.is_active:
+            self.stream = self.audio.open(format=self.format, 
+                                          channels=self.channels, 
+                                          rate=self.rate, 
+                                          input=True, 
+                                          frames_per_buffer=self.chunk)
+            self.is_active = True
+            print("===Stream started.")
+
+    def stream_stop(self):
+        if self.is_active:
+            self.stream.stop_stream()
+            self.stream.close()
+            self.audio.terminate()
+            self.is_active = False
+            print("===Stream stopped.")    
+
+    def sst_module(self, TRANSCRIBER) :
+        frame_duration = 20  # 프레임 길이 (ms)
+        frame_size = int(self.rate * frame_duration / 1000)  # 프레임 크기 계산
+        
+        #오디오 스트림 open 시작
+        self.stream = self.stream_start()
+        vad = webrtcvad.Vad(3)  # VAD 모드 설정 (0~3, 3이 가장 엄격)
+
+        frames = []
+        silence_frames = 0
+        speaking_frames = 0
+        audio_data_collected = False
+        print("========읽기 시작 :: ")
+        result_text = ""
+        
+        try:
+            while True:
+                frame = self.stream.read(frame_size, exception_on_overflow=False)  # 20 ms의 오디오 프레임 읽기
+                is_speech = vad.is_speech(frame, self.rate)  # 현재 프레임에서 음성이 있는지 확인
+                frames.append(frame)
+                if is_speech:     
+                    print("========발화 o :: ", speaking_frames)
+                    silence_frames = 0
+                    speaking_frames += 1
+                    audio_data_collected = True
+                else :
+                    print("========발화 x :: ", silence_frames)
+                    silence_frames += 1
+                    if speaking_frames > 10 and audio_data_collected and silence_frames > 15:  # 충분한 양의 음성 데이터 후 1초 이상의 침묵이 있으면 처리 시작
+                        print("========출력 시작 :: ")
+                        buffer = np.concatenate([np.frombuffer(frame, dtype=np.int16) for frame in frames])  # 프레임들을 하나의 배열로 합침
+                        audio_float = buffer.astype(np.float32) / 32768  # 정규화
+                        result = TRANSCRIBER({"raw": audio_float, 
+                                                "sampling_rate": self.rate, "language":"ko"})
+                        
+                        if result['text']:
+                            print("=====STT 결과::", result['text'])
+                            result_text = result['text']
+                            break
+                    elif silence_frames > 100 :            
+                        print("=====음성 없음 및 종료::")
+                        result_text = "음성 없음 및 종료"
                         break
-                elif silence_frames > 100 :            
-                    print("=====음성 없음 및 종료::")
-                    result_text = "음성 없음 및 종료"
-                    break
-                   
-       
-    except Exception as e:
-            print(f"Error processing audio: {e}")
-            return jsonify({"result": '음성 인식에 실패했습니다.'})
-            
-    finally :    
+                    
+        
+        except Exception as e:
+                print(f"Error processing audio: {e}")
+                return jsonify({"result": '음성 인식에 실패했습니다.'})
+                
+        finally :    
 
-        stream.stop_stream()
-        stream.close()
-        audio.terminate()
+            self.stream_stop()
 
-    return result_text
+        return result_text

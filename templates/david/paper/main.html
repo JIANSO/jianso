@@ -69,12 +69,13 @@ inner가 계속 변경될 예정.
         .catch(error => console.error('Error loading the page: ', error));
   }
 
-  function start_recording(){
+  function start_stt(){
     /*
     실시간 음성 인식
+    음성 인식으로 페이지 이동
     */
-    console.log("====파이썬 서버 시작=====")
-    fetch('/start_recording')
+    console.log("====음성 인식 시작=====")
+    fetch('/start_stt')
         .then(response => response.json())
         .then(data => {
             alert('페이지:: ' + data.return_result + '\n사용자 음성:: ' + data.audio_text);
@@ -82,22 +83,36 @@ inner가 계속 변경될 예정.
             // llm 통과 후 다음 페이지 넘어갈 예정
             // 서버에서 처리 후 1,2,3 에 따라 페이지 넘길 예정 
             if(data.return_result !== 0){
+              stop_stt();
               get_inner_page(data.return_result);
+
             }
-           
-            stopCamera();
+        })
+        .catch(error => console.error('Error:', error));
+  }
+
+  function stop_stt(){
+    console.log("====움성 인식 종료=====")
+    fetch('/stop_stt')
+        .then(response => response.json())
+        .then(data => {
+            console.log('===음성 인식 종료 완료===')
         })
         .catch(error => console.error('Error:', error));
   }
 
   function camera_stream(){
+    /*
+    자바스크립트 화면 카메라 반사
+    */
+    
     let video = document.getElementById('video');
-    // 웹 카메라 시작
+    
     if (navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(function(stream) {
                 video.srcObject = stream;
-                camera_recognition();
+                start_face_recognition();
             })
             .catch(function(error) {
                 console.error("===카메라 접근에 실패했습니다:", error);
@@ -107,21 +122,24 @@ inner가 계속 변경될 예정.
     }
   }
 
-  function camera_recognition(){
+  function start_face_recognition(){
+    /*
+    파이썬 cv2 얼굴 인증
+    */
     console.log("====camera_recognition=====")
-    fetch('/start_recording')
+    fetch('/start_face_recognition')
         .then(response => response.json())
         .then(data => {
             alert('결과:: ' + data.return_result);
 
-            stopCamera()
+            start_face_recognition();
         })
         .catch(error => console.error('Error:', error));
   }
 
   // 카메라 종료
-  function stopCamera() {
-     
+  function start_face_recognition() {
+    // ajax로 파이썬 카메라 종료하기
     document.getElementById('video').srcObject.getTracks().forEach(function(track) {
           track.stop();
       });

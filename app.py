@@ -1,13 +1,14 @@
 from flask import Flask, render_template,jsonify
 from API.get_page import get_page
 from API.sst import sst
-from API.recognition import recognition
+#from API.recognition import recognition 윈도우용 임시 제거
 import torch
 from transformers import pipeline
 if torch.cuda.is_available():
     device = "cuda"
 else:
     device = "cpu"
+    
 if torch.backends.mps.is_available():
     device = "mps"  # Apple Metal Performance Shaders
 
@@ -48,10 +49,9 @@ def home():
 @app.route('/start_stt')
 def start_stt():
     audio_text = sst.audio_stream().sst_module(TRANSCRIBER)
-    #아래 함수 속도 때문에 테스트 중
+   
     print("===app.py start_stt===")
-    #audio_text = no_transcriber_whisper.sst_module()
-    
+     
     return_result = "없음"
     if "시작" in audio_text :
         return_result = "start"
@@ -74,8 +74,11 @@ def stop_stt():
 
 @app.route('/start_face_recognition')
 def start_face_recognition():
-    return_result = recognition.face_recognition.generate_frames()
-    print("===return_result ::", return_result)
+    
+    #윈도우용 임시 제거
+    return_result = None
+    #return_result = recognition.face_recognition.generate_frames()
+    #print("===return_result ::", return_result)
     
     return jsonify({"return_result": return_result })
 

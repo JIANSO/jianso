@@ -93,7 +93,8 @@ class audio_stream:
                         buffer = np.concatenate([np.frombuffer(frame, dtype=np.int16) for frame in frames])  # 프레임들을 하나의 배열로 합침
                         audio_float = buffer.astype(np.float32) / 32768  # 정규화
                         result = TRANSCRIBER({"raw": audio_float, 
-                                                "sampling_rate": self.rate, "language":"ko"})
+                                                "sampling_rate": self.rate, 
+                                                "language":"ko"})
                         
                         if result['text']:
                             print("=====STT 결과::", result['text'])

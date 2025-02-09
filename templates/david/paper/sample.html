@@ -99,7 +99,7 @@
     <script type="text/javascript">
       function startRecording() {
         //연구 후 삭제 예정
-        fetch('/start_recording')
+        fetch('/start_stt')
             .then(response => response.json())
             .then(data => {
                 document.getElementById('result').innerText = 'Max Amplitude: ' + data.max_amplitude;

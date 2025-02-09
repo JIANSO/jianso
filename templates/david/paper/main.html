@@ -10,15 +10,16 @@ inner가 계속 변경될 예정.
     <div class="inner-content" id="inner-content">
       
       <!--changable-->
-      <a href="#" id="inner_main" onclick="get_inner_page(next='start')" class="d-flex flex-column justify-content-center bg-info h-100" >
+      <a href="#" id="inner_main" onclick="get_inner_page(next='manage')" 
+      class="d-flex flex-column justify-content-center bg-info h-100" >
         <div class="d-flex flex-column justify-content-center align-items-center" style="height: 90%;">
           <div class="text-white mb-2">나누는 사랑, 커지는 희망</div>
           <div class="mb-2"><h1 class="text-white">전자바우처<h1></div>
           <div class=""><h6 class="text-white">화면을 터치하세요</h6></div>
         </div>
+
         <div class="d-flex align-items-center bg-secondary" 
         style="height: 10%;justify-content: space-around">
-  
           <img src="static/david/img/h_logo_1.png" style="width: 30%;" alt="image">
           <img src="static/david/img/logo_wh.svg" style="width: 30%;" alt="image">
         </div>
@@ -29,44 +30,60 @@ inner가 계속 변경될 예정.
   </div>
 </div> 
 
+
+
 <script type="text/javascript">
   document.addEventListener('DOMContentLoaded', function () {
    
   });
 
   function get_inner_page(next){
-      console.log("====get_inner_page===")
+      console.log("====get_inner_page===");
+
       fetch('get_page/get_next_page?next='+next)
-        .then(response => response.text())  
-        .then(html => {
-          document.getElementById('inner-content').innerHTML = html;
-          //1초 후 시작
-          // TODO: next에 따라서 start_recoding을 하고 안하고 결정하기.
-          if(next == 'start'){
-            //서비스 시작
-            debugger
-            start_recording();
-          }else if(next == 'recognition')
-          {
-            //서비스 관리
-            debugger
-            camera_stream();
-          }
-          
-        })
-        .catch(error => console.error('Error loading the page: ', error));
+      .then(response => response.text())  
+      .then(html => {
+        //페이지 렌더링
+        document.getElementById('inner-content').innerHTML = html;
+        
+        //페이지 렌더링 후 후처리
+        //after_page_rendering(next);
+      })
+      .catch(error => console.error('Error loading the page: ', error));
   }
 
-  function get_prev_page(prev){
-      console.log("====get_prev_page===")
-      fetch('get_page/get_prev_page?prev='+prev)
-        .then(response => response.text())  
-        .then(html => {
-          document.getElementById('inner-content').innerHTML = html;
-          //start_recording();
-          stopCamera();
-        })
-        .catch(error => console.error('Error loading the page: ', error));
+  function after_page_rendering(){
+    // TODO: 1초 후 시작
+    // TODO: next에 따라서 start_recoding을 하고 안하고 결정하기.
+    
+    if(next == 'manage'){
+      start_stt();
+    }else if(next == 'start'){
+      start_stt();
+    }else if(next == 'end'){
+      start_stt();
+    }else if(next == 'recognition'){
+      camera_stream();
+    }
+  }
+
+  function get_prev_page(prev, curr){
+    //이전으로 돌아가기 
+    console.log("====get_prev_page===")
+
+    fetch('get_page/get_prev_page?prev='+prev)
+    .then(response => response.text())  
+    .then(html => {
+      document.getElementById('inner-content').innerHTML = html;
+      // 이전으로 돌아가기 후처리
+      // 음성 종료, 재시작 예정
+      // 카메라 종료 
+      if(curr == 'recognition'){
+        stop_face_recognition();
+      }
+      
+    })
+    .catch(error => console.error('Error loading the page: ', error));
   }
 
   function start_stt(){
@@ -76,29 +93,28 @@ inner가 계속 변경될 예정.
     */
     console.log("====음성 인식 시작=====")
     fetch('/start_stt')
-        .then(response => response.json())
-        .then(data => {
-            alert('페이지:: ' + data.return_result + '\n사용자 음성:: ' + data.audio_text);
+    .then(response => response.json())
+    .then(data => {
+        alert('페이지:: ' + data.return_result + '\n사용자 음성:: ' + data.audio_text);
 
-            // llm 통과 후 다음 페이지 넘어갈 예정
-            // 서버에서 처리 후 1,2,3 에 따라 페이지 넘길 예정 
-            if(data.return_result !== 0){
-              stop_stt();
-              get_inner_page(data.return_result);
+        // llm 통과 후 다음 페이지 넘어갈 예정
+        // 서버에서 처리 후 1,2,3 에 따라 페이지 넘길 예정 
+        if(data.return_result !== 0){
+          stop_stt();
+          get_inner_page(data.return_result);
 
-            }
-        })
-        .catch(error => console.error('Error:', error));
+        }
+    })
+    .catch(error => console.error('Error:', error));
   }
 
   function stop_stt(){
-    console.log("====움성 인식 종료=====")
     fetch('/stop_stt')
-        .then(response => response.json())
-        .then(data => {
-            console.log('===음성 인식 종료 완료===')
-        })
-        .catch(error => console.error('Error:', error));
+    .then(response => response.json())
+    .then(data => {
+        console.log('===음성 인식 종료 완료===')
+    })
+    .catch(error => console.error('Error:', error));
   }
 
   function camera_stream(){
@@ -110,13 +126,13 @@ inner가 계속 변경될 예정.
     
     if (navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function(stream) {
-                video.srcObject = stream;
-                start_face_recognition();
-            })
-            .catch(function(error) {
-                console.error("===카메라 접근에 실패했습니다:", error);
-            });
+        .then(function(stream) {
+            video.srcObject = stream;
+            start_face_recognition();
+        })
+        .catch(function(error) {
+            console.error("===카메라 접근에 실패했습니다:", error);
+        });
     } else {
         alert('===getUserMedia를 지원하지 않는 브라우저입니다.');
     }
@@ -128,17 +144,17 @@ inner가 계속 변경될 예정.
     */
     console.log("====camera_recognition=====")
     fetch('/start_face_recognition')
-        .then(response => response.json())
-        .then(data => {
-            alert('결과:: ' + data.return_result);
+    .then(response => response.json())
+    .then(data => {
+        alert('결과:: ' + data.return_result);
 
-            start_face_recognition();
-        })
-        .catch(error => console.error('Error:', error));
+        stop_face_recognition();
+    })
+    .catch(error => console.error('Error:', error));
   }
 
-  // 카메라 종료
-  function start_face_recognition() {
+  // 카메라 종료, 수정 필요. 컴퓨터 카메라 종료가 되는지 확인해야함
+  function stop_face_recognition() {
     // ajax로 파이썬 카메라 종료하기
     document.getElementById('video').srcObject.getTracks().forEach(function(track) {
           track.stop();

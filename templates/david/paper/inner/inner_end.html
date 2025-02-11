@@ -1,16 +1,14 @@
-<div id="inner_end" class="h-100" >
+<div id="inner_end" class="h-100 d-flex flex-column" >
+  <div>
     <div class="pt-3 pb-1 bg-warning text-center">
       <h5 class="text-white">장애인 활동 지원</h5>
     </div>
-    <!-- -->
-    <div class="p-3">
-      <button type="button" id="click_button" class="btn btn-secondary" 
-      onclick="get_prev_page(prev='manage', curr='end')">이전 단계</button>
+    <div class="px-3 my-3">
+      <div class="fs-3 text-center"><b>서비스 종료</b></div>
     </div>
+  
 
-    <div class="p-3"><h4>서비스 종료</h4></div>
-
-    <div class="p-3">
+    <div class="px-3 py-2">
       <!-- Numbered list group -->
       <ol class="list-group">
         <li class="list-group-item">서비스 날짜</li>
@@ -20,19 +18,27 @@
       </ol>
     </div>
 
-    <div class="p-3">
-        <p class="fs-lg">
-          <b>5분 안에 결제를 완료하세요. 미완료시 이전 단계로 돌아갑니다.</b>
-        </p>
-      </div>
-
-    <div class="p-3">
- 
-    <button type="button" id="" class="btn btn-secondary" 
-    onclick="">확인</button>
-    
+    <div class="px-3 py-2">
+      <p class="fs-lg">
+        <b>5분 안에 결제를 완료하세요. 미완료시 이전 단계로 돌아갑니다.</b>
+      </p>
     </div>
-   
-  
+  </div>
+  <div class="mt-auto">
+    <div class="px-3 py-2">
+      <div class="d-flex justify-content-evenly">
+        <button type="button" id="click_button" class="btn btn-secondary" 
+        onclick="get_prev_page(prev='manage', curr='end')">이전 단계</button>
+        <button type="button" id="" class="btn btn-secondary" 
+        onclick="">확인</button>
+      </div>
       
+      
+    </div>
+  </div>
+    
+
+    
+   
+
   </div>

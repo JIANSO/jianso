@@ -14,27 +14,56 @@
     <div class="px-3 my-3">
       <div class="fs-3 text-center"><b>서비스 시작</b></div>
     </div>
-  
-    <div class="px-3 py-2 text-center">
-      <div class="spinner-grow text-info" role="status">
-        <span class="visually-hidden">음성 인식</span>
-      </div>
-    </div>
+
+    <!--현재 정보-->
     <div class="px-3 py-2">
-      <p class="fs-lg">
-        <b>활동보조 서비스 시작을 하시려면 확인 버튼 클릭 또는 확인이라고 말씀해 주세요.</b>
+      <ol class="list-group">
+        <li class="list-group-item">
+          <div class="item-title">서비스 날짜</div>
+          <div class="item-content">2025-02-11</div>
+        </li>
+        <li class="list-group-item">
+          <div class="item-title">서비스 상태</div>
+          <div class="item-content">시작 전</div>
+        </li>
+        <li class="list-group-item">
+          <div class="item-title">활동 유형</div>
+          <div class="item-content">{{ parameter }}</div>
+        </li>
+        <li class="list-group-item">
+          <div class="item-title">시작시간</div>
+          <div class="item-content">12:00</div>
+        </li>
+        
+      </ol>
+    </div>
+    <!--현재 정보-->
+  
+
+    <div class="px-3 py-2">
+      <p class="fs-lg px-3 text-center">
+        <b>활동보조 서비스를 시작하려면 <br/> 
+          확인버튼을 클릭 하시거나 또는 <br/> 
+          확인이라고 말씀해 주세요.</b>
       </p>
       
     </div>
   </div>
+
+   <!-- 음성 인식 이미지 -->
+   <div class="p-3 text-center">
+    <div class="spinner-grow text-info" role="status"></div>
+    <div class="fs-sm">말씀해 주세요</div>
+  </div>
+  <!-- /음성 인식 이미지 -->
+
   <!--버튼 영역-->
   <div class="mt-auto">
     <div class="p-3">
       <div class="d-flex justify-content-evenly">
         <button type="button" id="click_button" class="btn btn-secondary" 
         onclick="get_prev_page(prev='manage', curr='')">이전 단계</button>
-        <button type="button" id="" class="btn btn-secondary" 
-        onclick="">취소</button>
+      
         <button type="button" id="" class="btn btn-secondary" 
         onclick="">확인</button>
       </div>

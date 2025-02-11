@@ -9,11 +9,10 @@
   
 
     <div class="px-3 py-2">
-      <!-- Numbered list group -->
       <ol class="list-group">
         <li class="list-group-item">
           <div class="item-title">서비스 날짜</div>
-          <div class="item-content">2022-01-01</div>
+          <div class="item-content">2025-02-11</div>
         </li>
         <li class="list-group-item">
           <div class="item-title">서비스 상태</div>
@@ -43,11 +42,18 @@
       </ul>
     </div>
   </div>
-  <div class="mt-auto">
-    <!-- -->
-    <div class="px-3 py-2">
-      <div class="d-flex justify-content-evenly">
 
+  <!-- 음성 인식 이미지 -->
+  <div class="p-3 text-center">
+    <div class="spinner-grow text-info" role="status"></div>
+    <div class="fs-sm">말씀해 주세요</div>
+  </div>
+  <!-- /음성 인식 이미지 -->
+
+  <!--하단 버튼-->
+  <div class="mt-auto">
+    <div class="p-3">
+      <div class="d-flex justify-content-evenly">
       <button type="button" id="click_button" class="btn btn-secondary" 
       onclick="get_prev_page(prev='manage', curr='end')">이전 단계</button>
       </div>

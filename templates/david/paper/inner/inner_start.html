@@ -15,23 +15,28 @@
       <div class="fs-3 text-center"><b>서비스 시작</b></div>
     </div>
   
-    <div class="px-3 py-2 text-center">
-      <div class="spinner-grow text-info" role="status">
-        <span class="visually-hidden">음성 인식</span>
-      </div>
-    </div>
+    
   
     <div class="px-3 py-2">
-      <p class="fs-lg"><b>서비스 유형 선택</b></p>
-      <div class="list-group">
+      <p class="fs-lg m-2"><b>서비스 유형 선택</b></p>
+      <div class="list-group" name="service_type">
         <a href="#" class="list-group-item list-group-item-action">활동보조</a>
-        <a href="#" class="list-group-item list-group-item-action">활동보조 2인이상</a>
+        <a href="#" class="list-group-item list-group-item-action">활동보조 2인 이상</a>
         <a href="#" class="list-group-item list-group-item-action">방문목욕</a>
         <a href="#" class="list-group-item list-group-item-action">방문간호</a>
-        <a href="#" class="list-group-item list-group-item-action">방문간호지시서</a>
+        <a href="#" class="list-group-item list-group-item-action">방문간호 지시서</a>
       </div>
     </div>
   </div>
+
+  
+
+  <!-- 음성 인식 이미지 -->
+  <div class="p-3 text-center">
+    <div class="spinner-grow text-info" role="status"></div>
+    <div class="fs-sm">말씀해 주세요</div>
+  </div>
+  <!-- /음성 인식 이미지 -->
   <!--버튼 영역-->
   <div class="mt-auto">
     <div class="p-3">
@@ -39,13 +44,14 @@
         <button type="button" id="click_button" class="btn btn-secondary" 
       onclick="get_prev_page(prev='manage', curr='')">이전 단계</button>
       
-      <button type="button" id="click_button" class="btn btn-secondary" 
-      onclick="get_inner_page('start_check')">다음</button>
+        <button type="button" id="click_button" class="btn btn-secondary" 
+        onclick="check_service_type()">다음</button>
       
       </div>
       
     </div>
   </div>
+ 
 
 
 

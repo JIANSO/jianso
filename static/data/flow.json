@@ -1,4 +1,8 @@
 {
     "start" : {}
     , "end" : {}
+    , "info" : {"date":"" 
+                ,"service_type" : "" 
+                ,"start_time": ""
+                ,"end_time" :""}
 }

@@ -65,7 +65,7 @@ class audio_stream:
         frame_size = int(self.rate * frame_duration / 1000)  # 프레임 크기 계산
         
         #오디오 스트림 open 시작
-        self.stream = self.stream_start()
+        self.stream_start()
         vad = webrtcvad.Vad(3)  # VAD 모드 설정 (0~3, 3이 가장 엄격)
 
         frames = []

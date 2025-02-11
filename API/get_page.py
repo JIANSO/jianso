@@ -14,14 +14,17 @@ def inner_main():
 def get_prev_page():
     #데이터 출력
     prev = request.args.get('prev', 'default_value')
+    
     return render_template("david/paper/inner/inner_"+prev+".html")
 
 @get_page.route('/get_next_page', methods=['GET'])
 def get_next_page():
    
     next = request.args.get('next', 'default_value')
-    paramter = request.args.get('paramter', '')
-    return render_template("david/paper/inner/inner_"+next+".html", paramter=paramter)
+    user_parameter = request.args.get('user_parameter', '')
+    print("===user_parameter",user_parameter)
+    
+    return render_template("david/paper/inner/inner_"+next+".html", user_parameter=user_parameter)
 
 @get_page.route('/get_service_data')
 def get_service_data():

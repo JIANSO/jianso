@@ -1,6 +1,8 @@
 from flask import Flask, render_template,jsonify
 from API.get_page import get_page
+from API.module_collection import module_collection 
 from API.sst import sst
+
 #from API.recognition import recognition 윈도우용 임시 제거
 import torch
 from transformers import pipeline
@@ -26,7 +28,7 @@ TRANSCRIBER = pipeline(model="openai/whisper-large-v3-turbo",
 
 app = Flask(__name__)
 app.register_blueprint(get_page, url_prefix='/get_page')
-
+app.register_blueprint(module_collection, url_prefix='/module_collection')
 # debug 모드 설정
 app.config['DEBUG'] = True
 

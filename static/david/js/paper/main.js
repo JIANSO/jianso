@@ -27,10 +27,8 @@ function after_rendering(next){
   }else if(next == 'start_step1'){
    //after_rendering_module.stt.start_stt();
     after_rendering_module.active_list();
-    
   }else if(next == 'start_step2'){
     after_rendering_module.get_currunt_datetime();
-    
   }else if(next == 'end'){
     //after_rendering_module.stt.start_stt();
   }else if(next == 'recognition'){
@@ -166,31 +164,43 @@ function get_prev_page(prev, curr){
 
 function check_service_type(){
   // 서비스 시작 시 서비스 유형 선택
-    let service_type = document.querySelector('div[name="service_type"] a.active').innerText;
-    if (service_type==undefined){
-      alert("서비스 유형을 선택해 주세요");
-      return
-    }
-    get_inner_page('start_step2', user_parameter=service_type);
+  if (document.querySelector('div[name="service_type"] a.active')==null){
+    alert("서비스 유형을 선택해 주세요");
+    return
+  }  
+ 
+    
+    get_inner_page('start_step2', 
+      user_parameter=document.querySelector('div[name="service_type"] a.active').innerText);
   }
 
   function confirm_service_start(){
     /* 
-    서비스 최종 시작 
-    post 방식으로 데이터 보내기
+      서비스 최종 시작 
+      post 방식으로 데이터 보내기
     */
-    data = {}
-    fetch('/confirm_service_start', {  // POST 요청을 보낼 서버의 엔드포인트
+   
+    fetch('module_collection/confirm_service_start', {  // POST 요청을 보낼 서버의 엔드포인트
         method: 'POST',   // HTTP 메소드
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data) 
+        body: JSON.stringify({
+          "service_date" : document.getElementById("service_date").innerText
+          ,"service_type" : document.getElementById("service_type")?document.getElementById("service_type").innerText:""
+          ,"service_status" : "서비스 진행중"
+          ,"service_start_time" : document.getElementById("service_start_time").innerText
+          ,"service_end_time" : document.getElementById("service_end_time")?document.getElementById("service_end_time").innerText:""
+        }) 
     })
     .then(response => response.json())  
     .then(data => {
-        // 데이터 렌더링예정
-    })
+        // 데이터 렌더링 예정
+        console.log(data);
+        document.getElementById("user_guide").innerHTML = `<b>활동지원 서비스가 시작되었습니다.</b>`
+        document.getElementById("button_group").innerHTML  = `<button type="button" id="" class="btn btn-lg btn-secondary" 
+        onclick="get_inner_page('manage')">메인 화면</button>`
+      })
     .catch((error) => {
         console.error('Error:', error);
     });

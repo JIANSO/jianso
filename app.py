@@ -1,4 +1,4 @@
-from flask import Flask, render_template,jsonify
+from flask import Flask, render_template,jsonify, request
 from API.get_page import get_page
 from API.module_collection import module_collection 
 from API.sst import sst
@@ -34,18 +34,9 @@ app.config['DEBUG'] = True
 
 @app.route('/')
 def home():
-    """
-    connection = db_connect.get_db_connection()
-    with connection.cursor() as cursor:
-        sql = "SELECT VERSION()"
-        cursor.execute(sql)
-        result = cursor.fetchall() 
-        print("=======Successfully connected to MySQL :: ", result)
-        
-        cursor.close()
-        connection.close()
-        """
-    
+   
+
+  
     return render_template("/index.html")
 
 @app.route('/start_stt')

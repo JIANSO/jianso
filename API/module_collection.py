@@ -6,10 +6,19 @@ module_collection = Blueprint('module_collection', __name__)
 inner page html만 전달하는 함수 모음
 """
 
-@module_collection.route('/get_service_data')
+def get_service_status():
+    
+    path = 'static/data/flow.json'
+    with open(path, 'r', encoding='utf-8') as file:
+        data = json.load(file)
+
+    return data['service_status']
+
+
+@module_collection.route('/get_service_data', methods=['GET'])
 def get_service_data():
     #데이터 출력
-    path = '/static/data/flow.json'
+    path = 'static/data/flow.json'
     with open(path, 'r', encoding='utf-8') as file:
         data = json.load(file)
 
@@ -19,7 +28,7 @@ def get_service_data():
 def save_service_data():
     #데이터 입력
     data = request.get_json()
-    path = '/static/data/flow.json'
+    path = 'static/data/flow.json'
     
     # 기존 데이터를 유지하고 새 데이터 추가
     try:
@@ -39,11 +48,14 @@ def save_service_data():
     
     return jsonify({"status": "success", "message": "Data saved successfully."})
 
-@module_collection.route('/confirm_service_start', methods=['POST'])
-def confirm_service_start():
-    #데이터 저장 및 출력
+
+@module_collection.route('/confirm_service', methods=['POST'])
+def confirm_service():
+    """
+    서비스 시작 또는 종료 확정
+
+    """
     data = request.get_json()
-    print("=====data ::", data)
     path = 'static/data/flow.json'
     
     # 기존 데이터를 유지하고 새 데이터 추가

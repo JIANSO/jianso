@@ -8,7 +8,8 @@
 <div id="inner_manage" class="h-100 d-flex flex-column" >
   <div >
     <div class="pt-3 pb-1 bg-warning text-center">
-      <h5 class="text-white">장애인 활동 지원</h5>
+      <h5 class="text-white">장애인 활동 지원
+      </h5>
     </div>
 
     <!--information-->
@@ -44,18 +45,22 @@
     
     <div class="px-3 py-2">
       <ul class="nav nav-tabs flex-column" role="tablist">
+        {% if service_status != '서비스 진행중' %}
         <li class="nav-item">
-          <a class="btn btn-info shadow-info w-100" 
-          href="#" onclick="get_inner_page('start_step1')" data-bs-toggle="tab" role="tab">
-            서비스 시작
-          </a>
-        </li>
+            <a class="btn btn-info shadow-info w-100" 
+            href="#" onclick="get_inner_page('start_step1')" data-bs-toggle="tab" role="tab">
+                서비스 시작
+            </a>
+        </li> 
+        {% endif %}
+        {% if service_status != '서비스 없음' %}
         <li class="nav-item">
-          <a class="btn btn-info shadow-info w-100" 
-          href="#" onclick="get_inner_page('end')" data-bs-toggle="tab" role="tab">
-            서비스 종료
-          </a>
+            <a class="btn btn-info shadow-info w-100" 
+            href="#" onclick="get_inner_page('end_step1')" data-bs-toggle="tab" role="tab">
+                서비스 종료
+            </a>
         </li>
+        {% endif %}
         <li class="nav-item">
             <a class="btn btn-info shadow-info w-100" 
             href="#" onclick="get_inner_page('data')" data-bs-toggle="tab" role="tab">

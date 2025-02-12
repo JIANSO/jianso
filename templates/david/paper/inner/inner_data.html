@@ -7,34 +7,33 @@
       <div class="fs-3 text-center"><b>서비스 관리</b></div>
     </div>
   
-
+    <!--현재 정보-->
     <div class="px-3 py-2">
       <ol class="list-group">
         <li class="list-group-item">
-          <div class="item-title">서비스 날짜</div>
-          <div class="item-content">2025-02-11</div>
-        </li>
-        <li class="list-group-item">
           <div class="item-title">서비스 상태</div>
-          <div class="item-content">활성</div>
+          <div class="item-content" id="service_status"></div>
         </li>
         <li class="list-group-item">
-          <div class="item-title">시작시간</div>
-          <div class="item-content">12:00</div>
+          <div class="item-title">활동 유형</div>
+          <div class="item-content" id="service_type" ></div>
         </li>
         <li class="list-group-item">
-          
-          <div class="item-title">종료시간</div>
-          <div class="item-content">14:00</div>
+          <div class="item-title">시작 시간</div>
+          <div class="item-content" id="service_start_time"></div>
         </li>
-        
+        <li class="list-group-item">
+          <div class="item-title">종료 시간</div>
+          <div class="item-content" id="service_end_time"></div>
+        </li>
       </ol>
     </div>
+    <!--현재 정보-->
 
     <div class="px-3 py-2">
       <ul class="nav nav-tabs flex-column" role="tablist">
         <li class="nav-item">
-          <a class="btn btn-info shadow-info w-100" 
+          <a class="btn btn-lg btn-info shadow-info w-100" 
           href="#" onclick="" data-bs-toggle="tab" role="tab">
             당일 거래 취소
           </a>

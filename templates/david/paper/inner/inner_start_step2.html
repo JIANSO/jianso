@@ -19,19 +19,11 @@
     <div class="px-3 py-2">
       <ol class="list-group">
         <li class="list-group-item">
-          <div class="item-title">서비스 날짜</div>
-          <div class="item-content" id="service_date"></div>
-        </li>
-        <li class="list-group-item">
-          <div class="item-title">서비스 상태</div>
-          <div class="item-content" id="service_status">시작 전</div>
-        </li>
-        <li class="list-group-item">
           <div class="item-title">활동 유형</div>
           <div class="item-content" id="service_type" >{{ user_parameter }}</div>
         </li>
         <li class="list-group-item">
-          <div class="item-title">시작시간</div>
+          <div class="item-title">시작 시간</div>
           <div class="item-content" id="service_start_time"></div>
         </li>
         
@@ -65,7 +57,7 @@
         onclick="get_prev_page(prev='manage', curr='')">이전 단계</button>
       
         <button type="button" id="" class="btn btn-lg btn-secondary" 
-        onclick="confirm_service_start()">확인</button>
+        onclick="confirm_service('start')">확인</button>
       </div>
       
     </div>

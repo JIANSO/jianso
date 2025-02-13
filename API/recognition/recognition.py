@@ -15,7 +15,7 @@ return 시 성공, 실패 여부 전달할 예정
 # 추후 사용자 얼굴 저장
 
 
-class face_recognition :
+class face_recognition_class :
     def __init__(self):
         self.known_image = face_recognition.load_image_file("API/recognition/taya.png")
         self.known_face_encoding = face_recognition.face_encodings(self.known_image)[0]
@@ -73,6 +73,12 @@ class face_recognition :
 
             attempts += 1  # 인증 시도 횟수 증가
 
-        self.stop_camera()
+
+        #인증 여부 db 저장하기
+        import API.module_collection as module_collection
+        module_collection.update_json({"data" :  {"auth" : "True"}, "path" : "auth"})
         
+        print("=====카메라 인증 return_result ::", return_result)
+        
+
         return return_result

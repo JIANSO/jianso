@@ -9,6 +9,10 @@ inner page html만 전달하는 함수 모음
 
 @get_page.route('/main')
 def inner_main():
+    #처음 화면 경우 인증 여부 초기화 및 db 저장
+    import API.module_collection as module_collection
+    module_collection.update_json({"data" :  {"auth" : "False"}, "path" : "auth"})
+
     return render_template("david/paper/inner/inner_main.html")
 
 @get_page.route('/get_prev_page', methods=['GET'])

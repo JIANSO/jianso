@@ -3,7 +3,7 @@ from API.get_page import get_page
 from API.module_collection import module_collection 
 from API.sst import sst
 
-#from API.recognition import recognition 윈도우용 임시 제거
+from API.recognition import recognition as recognition
 import torch
 from transformers import pipeline
 if torch.cuda.is_available():
@@ -25,7 +25,6 @@ TRANSCRIBER = pipeline(model="openai/whisper-large-v3-turbo",
                     device=device
                     )
 
-
 app = Flask(__name__)
 app.register_blueprint(get_page, url_prefix='/get_page')
 app.register_blueprint(module_collection, url_prefix='/module_collection')
@@ -35,8 +34,6 @@ app.config['DEBUG'] = True
 @app.route('/')
 def home():
    
-
-  
     return render_template("/index.html")
 
 @app.route('/start_stt')
@@ -62,18 +59,27 @@ def stop_stt():
     음성 인식 종료
     """
     sst.audio_stream().stream_stop()
+    print("===app.py stop_stt===")
 
     return jsonify({"return_result": 200})
 
 @app.route('/start_face_recognition')
 def start_face_recognition():
     
-    #윈도우용 임시 제거
     return_result = None
-    #return_result = recognition.face_recognition.generate_frames()
-    #print("===return_result ::", return_result)
+    face_recognition = recognition.face_recognition_class()
+    return_result = face_recognition.generate_frames()
     
-    return jsonify({"return_result": return_result })
+    return jsonify({"return_result": 200 })
+
+@app.route('/stop_face_recognition')
+def stop_face_recognition():
+    
+    return_result = None
+    face_recognition = recognition.face_recognition_class()
+    face_recognition.stop_camera()
+    
+    return jsonify({"return_result": "카메라 종료" })
 
 ##########################################################
 @app.errorhandler(Exception)

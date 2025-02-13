@@ -28,14 +28,20 @@ function after_rendering(next){
   // TODO: 서비스 진행중 여부를 항상 화면이 갖고 있도록 할까 고민중입니다.
   
   if(next == 'manage'){
-    //after_rendering_module.stt.start_stt();
+    after_rendering_module.stt.start_stt();
   }else if(next == 'start_step1'){
-   //after_rendering_module.stt.start_stt();
+    after_rendering_module.stt.stop_stt();
+    after_rendering_module.stt.start_stt();
     after_rendering_module.active_list();
   }else if(next == 'start_step2'){
+    after_rendering_module.stt.stop_stt();
+    after_rendering_module.stt.start_stt();
+
     after_rendering_module.get_currunt_datetime('service_start_time');
   }else if(next == 'end_step1'){
-    //after_rendering_module.stt.start_stt();
+    after_rendering_module.stt.stop_stt();
+    after_rendering_module.stt.start_stt();
+
     after_rendering_module.get_currunt_service_info(function(data){
       document.getElementById('service_status').innerText = data['service_status'];
       document.getElementById('service_type').innerText = data['service_type'];
@@ -45,9 +51,11 @@ function after_rendering(next){
       after_rendering_module.get_currunt_datetime('service_end_time');
     });
   }else if(next == 'recognition'){
+    //after_rendering_module.stt.stop_stt();
     //추후 모든 모듈마다 붙일 것
-    //after_rendering_module.face_recognition.start_face_recognition();
+    after_rendering_module.face_recognition.start_face_recognition();
   }else if(next == 'data'){
+    //after_rendering_module.stt.start_stt();
     after_rendering_module.get_currunt_service_info(function(data){
       document.getElementById('service_status').innerText = data['service_status'];
       document.getElementById('service_type').innerText = data['service_type'];
@@ -60,80 +68,81 @@ function after_rendering(next){
 
 after_rendering_module = {
   stt : {
-   start_stt: function() {
-      /*
-     실시간 음성 인식
-     음성 인식으로 페이지 이동
-     */
-     console.log("====음성 인식 시작=====")
-     //TODO 서버 음성 집어넣기
- 
-     fetch('/start_stt')
-     .then(response => response.json())
-     .then(data => {
-         alert('페이지:: ' + data.return_result + '\n사용자 음성:: ' + data.audio_text);
- 
-         // llm 통과 후 다음 페이지 넘어갈 예정
-         // 서버에서 처리 후 1,2,3 에 따라 페이지 넘길 예정 
-         if(data.return_result !== 0){
-           stop_stt();
-           get_inner_page(data.return_result);
- 
-         }
-     })
-     .catch(error => console.error('Error:', error));
-   },
-   stop_stt: function(){
-     fetch('/stop_stt')
-     .then(response => response.json())
-     .then(data => {
-         console.log('===음성 인식 종료 완료===')
-     })
-     .catch(error => console.error('Error:', error));
-   }
+          start_stt: function() {
+              /*
+            실시간 음성 인식
+            음성 인식으로 페이지 이동
+            */
+            console.log("====음성 인식 시작=====")
+            //TODO 서버 음성 집어넣기
+        
+            fetch('/start_stt')
+            .then(response => response.json())
+            .then(data => {
+                alert('페이지:: ' + data.return_result + '\n사용자 음성:: ' + data.audio_text);
+        
+                // llm 통과 후 다음 페이지 넘어갈 예정
+                // 서버에서 처리 후 1,2,3 에 따라 페이지 넘길 예정 
+                if(data.return_result !== 0){
+                  after_rendering_module.stt.stop_stt();
+                  //get_inner_page(data.return_result);
+        
+                }
+            })
+            .catch(error => console.error('Error:', error));
+          },
+          stop_stt: function(){
+            fetch('/stop_stt')
+            .then(response => response.json())
+            .then(data => {
+                console.log('===음성 인식 종료 완료===')
+            })
+            .catch(error => console.error('Error:', error));
+          }
   }
   ,face_recognition :{
-    camera_stream : function() {
-      /*
-       자바스크립트 화면 카메라 반사
-       */
-       
-       let video = document.getElementById('video');
-       
-       if (navigator.mediaDevices.getUserMedia) {
-           navigator.mediaDevices.getUserMedia({ video: true })
-           .then(function(stream) {
-               video.srcObject = stream;
-               start_face_recognition();
-           })
-           .catch(function(error) {
-               console.error("===카메라 접근에 실패했습니다:", error);
-           });
-       } else {
-           alert('===getUserMedia를 지원하지 않는 브라우저입니다.');
-       }
-   }
-   ,start_face_recognition : function(){
-     /*
-     파이썬 cv2 얼굴 인증
-     */
-     console.log("====camera_recognition=====")
-     fetch('/start_face_recognition')
-     .then(response => response.json())
-     .then(data => {
-         alert('결과:: ' + data.return_result);
-   
-         stop_face_recognition();
-     })
-     .catch(error => console.error('Error:', error));
-   }
-   ,stop_face_recognition : function() {
-     // 카메라 종료, 수정 필요. 컴퓨터 카메라 종료가 되는지 확인해야함
-     // ajax로 파이썬 카메라 종료하기
-     document.getElementById('video').srcObject.getTracks().forEach(function(track) {
-           track.stop();
-       });
-   }
+                        camera_stream : function() {
+                          /*
+                          자바스크립트 화면 카메라 반사
+                          */
+                          
+                          let video = document.getElementById('video');
+                          
+                          if (navigator.mediaDevices.getUserMedia) {
+                              navigator.mediaDevices.getUserMedia({ video: true })
+                              .then(function(stream) {
+                                  video.srcObject = stream;
+                                  start_face_recognition();
+                              })
+                              .catch(function(error) {
+                                  console.error("===카메라 접근에 실패했습니다:", error);
+                              });
+                          } else {
+                              alert('===getUserMedia를 지원하지 않는 브라우저입니다.');
+                          }
+                      }
+                      ,start_face_recognition : function(){
+                        /*
+                          cv2, face_recognition 얼굴 인증
+                        */
+                        fetch('/start_face_recognition')
+                        .then(response => response.json())
+                        .then(data => {
+                            alert('결과:: ' + data.return_result);
+                            //after_rendering_module.face_recognition.stop_face_recognition();
+                        })
+                        .catch(error => console.error('Error:', error));
+                      }
+                      ,stop_face_recognition : function() {
+                        // 카메라 종료, 수정 필요. 컴퓨터 카메라 종료가 되는지 확인해야함
+                        // ajax로 파이썬 카메라 종료하기
+                        fetch('/stop_face_recognition')
+                        .then(response => response.json())
+                        .then(data => {
+                            alert('결과:: ' + data.return_result);
+                        })
+                        .catch(error => console.error('Error:', error));
+                      }
   }
   , active_list: function() {
     /* 자바스크립트 list active */
@@ -169,8 +178,7 @@ after_rendering_module = {
     fetch('module_collection/get_service_data')
      .then(response => response.json())
      .then(data => {
-         //callback 실행 예정
-         console.log("===get_service_data 성공", data)
+         
          callback(data);
         
      })
@@ -179,7 +187,7 @@ after_rendering_module = {
 }
 
 function get_prev_page(prev, curr){
-  //이전으로 돌아가기 
+  //미완성. 이전으로 돌아가기 
   console.log("====get_prev_page===")
 
   fetch('get_page/get_prev_page?prev='+prev)
@@ -203,24 +211,26 @@ function go_to_start_step2(){
     return
   }  
 
-    get_inner_page('start_step2', 
-      user_parameter=document.querySelector('div[name="service_type"] a.active').innerText);
+  get_inner_page('start_step2', user_parameter=document.querySelector('div[name="service_type"] a.active').innerText);
 }
 
 function confirm_service(type=""){
   /* 
-    서비스 최종 시작 
-    post 방식으로 데이터 보내기
+    -서비스 최종 결정
   */
   let body_data = null;
   let callback = null;
   if(type=="start"){
     body_data = {
-      "service_type" : document.getElementById("service_type")?document.getElementById("service_type").innerText:""
-      ,"service_status" : "서비스 진행중"
-      ,"service_start_time" : document.getElementById("service_start_time").innerText
-      ,"service_end_time" : document.getElementById("service_end_time")?document.getElementById("service_end_time").innerText:""
-    }
+      "path" : "service_info"
+      ,"data" :{
+        "service_type" : document.getElementById("service_type")?document.getElementById("service_type").innerText:""
+        ,"service_status" : "서비스 진행중"
+        ,"service_start_time" : document.getElementById("service_start_time").innerText
+        ,"service_end_time" : document.getElementById("service_end_time")?document.getElementById("service_end_time").innerText:""
+      
+      }
+     }
 
     callback = function(){
       document.getElementById("user_guide").innerHTML = `<b>활동지원 서비스가 시작되었습니다.</b>`
@@ -229,10 +239,14 @@ function confirm_service(type=""){
     }
   }else if(type=="end"){
     body_data = {
-      "service_type" : ""
-      ,"service_status" : "서비스 없음"
-      ,"service_start_time" : ""
-      ,"service_end_time" : ""
+      "path" : "service_info"
+      ,"data" :{
+          "service_type" : ""
+          ,"service_status" : "서비스 없음"
+          ,"service_start_time" : ""
+          ,"service_end_time" : ""
+      }
+      
     }
 
     callback = function(){
@@ -241,25 +255,32 @@ function confirm_service(type=""){
       onclick="get_inner_page('main')">처음 화면</button>`
     }
   }else{
-    alert("관리자에게 문의해 주세요.")
+    alert("관리자에게 문의해 주세요.");
     return;
   }
   
-  fetch('module_collection/confirm_service', {  
+  update_data(body_data, callback);
+}
+
+function check_auth(){
+  /* 사용자 인증 결과 */
+}
+
+function update_data(body_data, callback){
+    fetch('module_collection/update_data', {  
       method: 'POST', 
       headers: {
           'Content-Type': 'application/json'
       },
       body: JSON.stringify(body_data) 
-  })
-  .then(response => response.json())  
-  .then(data => {
-      // 데이터 렌더링 예정
-      console.log(data);
-      callback();
-      
     })
-  .catch((error) => {
-      console.error('Error:', error);
-  });
+    .then(response => response.json())  
+    .then(data => {
+        // 데이터 렌더링 예정
+        console.log(data);
+        callback();
+      })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
 }

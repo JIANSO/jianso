@@ -3,7 +3,7 @@ from API.get_page import get_page
 from API.module_collection import module_collection 
 from API.sst import sst
 
-from API.recognition import recognition as recognition
+from API.recognition.recognition import face_recognition_class
 import torch
 from transformers import pipeline
 if torch.cuda.is_available():
@@ -67,19 +67,16 @@ def stop_stt():
 def start_face_recognition():
     
     return_result = None
-    face_recognition = recognition.face_recognition_class()
-    return_result = face_recognition.generate_frames()
+    face_recognition_instance = face_recognition_class()
+    try : 
+        print("실행2")
+        return_result = face_recognition_instance.generate_frames()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return_result = None
     
     return jsonify({"return_result": 200 })
 
-@app.route('/stop_face_recognition')
-def stop_face_recognition():
-    
-    return_result = None
-    face_recognition = recognition.face_recognition_class()
-    face_recognition.stop_camera()
-    
-    return jsonify({"return_result": "카메라 종료" })
 
 ##########################################################
 @app.errorhandler(Exception)

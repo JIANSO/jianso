@@ -10,10 +10,11 @@ function get_inner_page(next, user_parameter=''){
     }else{
       url_paramter = 'next='+next+'&user_parameter='+user_parameter;
     }
-    
+    after_rendering_module.stt.stop_stt();
     fetch('get_page/get_next_page?'+url_paramter)
     .then(response => response.text())  
     .then(html => {
+      
       //페이지 렌더링
       document.getElementById('inner-content').innerHTML = html;
       //페이지 렌더링 후 후처리
@@ -39,7 +40,7 @@ function after_rendering(next){
 
     after_rendering_module.get_currunt_datetime('service_start_time');
   }else if(next == 'end_step1'){
-    after_rendering_module.stt.stop_stt();
+    
     after_rendering_module.stt.start_stt();
 
     after_rendering_module.get_currunt_service_info(function(data){
@@ -51,9 +52,8 @@ function after_rendering(next){
       after_rendering_module.get_currunt_datetime('service_end_time');
     });
   }else if(next == 'recognition'){
-    //after_rendering_module.stt.stop_stt();
     //추후 모든 모듈마다 붙일 것
-    after_rendering_module.face_recognition.start_face_recognition();
+    after_rendering_module.face_recognition.start_face_recognition()
   }else if(next == 'data'){
     //after_rendering_module.stt.start_stt();
     after_rendering_module.get_currunt_service_info(function(data){
@@ -107,12 +107,11 @@ after_rendering_module = {
                           */
                           
                           let video = document.getElementById('video');
-                          
                           if (navigator.mediaDevices.getUserMedia) {
                               navigator.mediaDevices.getUserMedia({ video: true })
                               .then(function(stream) {
                                   video.srcObject = stream;
-                                  start_face_recognition();
+                                  after_rendering_module.face_recognition.start_face_recognition();
                               })
                               .catch(function(error) {
                                   console.error("===카메라 접근에 실패했습니다:", error);
@@ -128,20 +127,23 @@ after_rendering_module = {
                         fetch('/start_face_recognition')
                         .then(response => response.json())
                         .then(data => {
-                            alert('결과:: ' + data.return_result);
-                            //after_rendering_module.face_recognition.stop_face_recognition();
+                            alert('===결과:: ' + data.return_result);
+                            after_rendering_module.face_recognition.stop_face_recognition();
                         })
                         .catch(error => console.error('Error:', error));
                       }
                       ,stop_face_recognition : function() {
                         // 카메라 종료, 수정 필요. 컴퓨터 카메라 종료가 되는지 확인해야함
+                        let video = document.getElementById('video');
+                        let stream = video.srcObject;
+                        let tracks = stream.getTracks();
+
+                        tracks.forEach(function(track) {
+                            track.stop(); // 각 트랙을 멈춤
+                        });
+
+                        video.srcObject = null; // 비디오 소스를 null로 설정하여 참조 해제
                         // ajax로 파이썬 카메라 종료하기
-                        fetch('/stop_face_recognition')
-                        .then(response => response.json())
-                        .then(data => {
-                            alert('결과:: ' + data.return_result);
-                        })
-                        .catch(error => console.error('Error:', error));
                       }
   }
   , active_list: function() {

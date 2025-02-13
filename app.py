@@ -63,19 +63,33 @@ def stop_stt():
 
     return jsonify({"return_result": 200})
 
+face_recognition_instance = face_recognition_class()
 @app.route('/start_face_recognition')
 def start_face_recognition():
     
     return_result = None
-    face_recognition_instance = face_recognition_class()
+    
     try : 
-        print("실행2")
+        
         return_result = face_recognition_instance.generate_frames()
+        print(".......start_face_recognition")
+        print(".......start_face_recognition", return_result)
+
+        #json에게.. 결과를 알려줘야 하는데.. 값이 이동을 안하네 ^^;
+        return jsonify({"return_result": f"{return_result}" })
     except Exception as e:
         print(f"An error occurred: {e}")
         return_result = None
     
-    return jsonify({"return_result": 200 })
+
+@app.route('/stop_face_recognition')
+def stop_face_recognition():
+    
+    face_recognition_instance.stop_camera()
+
+    return  jsonify({"return_result": 200 })
+
+
 
 
 ##########################################################

@@ -1,7 +1,7 @@
 {
     "recognition": "True",
-    "service_type": "",
-    "service_status": "서비스 없음",
-    "service_start_time": "",
+    "service_type": "방문목욕",
+    "service_status": "서비스 진행중",
+    "service_start_time": "2025-02-13 17:24",
     "service_end_time": ""
 }

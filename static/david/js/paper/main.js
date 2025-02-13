@@ -10,7 +10,7 @@ function get_inner_page(next, user_parameter=''){
     }else{
       url_paramter = 'next='+next+'&user_parameter='+user_parameter;
     }
-    after_rendering_module.stt.stop_stt();
+    
     fetch('get_page/get_next_page?'+url_paramter)
     .then(response => response.text())  
     .then(html => {
@@ -31,11 +31,11 @@ function after_rendering(next){
   if(next == 'manage'){
     after_rendering_module.stt.start_stt();
   }else if(next == 'start_step1'){
-    after_rendering_module.stt.stop_stt();
+  
     after_rendering_module.stt.start_stt();
     after_rendering_module.active_list();
   }else if(next == 'start_step2'){
-    after_rendering_module.stt.stop_stt();
+  
     after_rendering_module.stt.start_stt();
 
     after_rendering_module.get_currunt_datetime('service_start_time');
@@ -53,7 +53,13 @@ function after_rendering(next){
     });
   }else if(next == 'recognition'){
     //추후 모든 모듈마다 붙일 것
-    after_rendering_module.face_recognition.start_face_recognition()
+    
+    after_rendering_module.face_recognition.start_face_recognition(function(){
+      document.getElementById('camera_guide').innerHTML = 
+      `<div class="spinner-border" style="width: 3.5rem; height: 3.5rem;"></div>
+       <div class="fs-sm">사용자 인증을 완료했습니다.</div>`
+      after_rendering_module.face_recognition.stop_face_recognition();
+    })
   }else if(next == 'data'){
     //after_rendering_module.stt.start_stt();
     after_rendering_module.get_currunt_service_info(function(data){
@@ -73,8 +79,13 @@ after_rendering_module = {
             실시간 음성 인식
             음성 인식으로 페이지 이동
             */
-            console.log("====음성 인식 시작=====")
+            
+            // 아이콘 변경
+            document.getElementById('speech_guide').innerHTML = `
+            <div class="spinner-grow text-info" role="status"></div>
+            <div class="fs-sm">말씀해 주세요</div>`
             //TODO 서버 음성 집어넣기
+
         
             fetch('/start_stt')
             .then(response => response.json())
@@ -83,8 +94,9 @@ after_rendering_module = {
         
                 // llm 통과 후 다음 페이지 넘어갈 예정
                 // 서버에서 처리 후 1,2,3 에 따라 페이지 넘길 예정 
+                after_rendering_module.stt.stop_stt();
                 if(data.return_result !== 0){
-                  after_rendering_module.stt.stop_stt();
+                  
                   //get_inner_page(data.return_result);
         
                 }
@@ -95,55 +107,43 @@ after_rendering_module = {
             fetch('/stop_stt')
             .then(response => response.json())
             .then(data => {
-                console.log('===음성 인식 종료 완료===')
+                document.getElementById('speech_guide').innerHTML = `
+                <div class="speech_circle bg-info m-1" role="status" 
+                onclick="after_rendering_module.stt.start_stt();">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYAAABV7bNHAAAAAXNSR0IArs4c6QAAA2dJREFUeF7tnAtu2zAMhtOTbT1Zt5OtPdkGFuGgGiH582U5KAMUbR1ZJj/+pOSH/HKbj0rgZfjoBAaQoZABNIByRWQUdFEF/bzdbvRDnx+Ljbzt/b7tY/mOtvH2nCwce5+pIHL+bQHjMPNL09/3/35FO/Ds1w2oCorkE8FqVVYXoG4wR2AEqkVRHYDIUEqlHZ9yUJWASDV/dlB5cMwyUFWAIqqh2kGj1Doy8d88mvFvYuBVZQmkCkAeOASAC2tEbFxnUFhpSFlAlFJrlLXRprqIooGhoLxGokH7ZAAhcLKKQfxCQIUhRQEhRlHUzpr5IgNEKN0igCw44WghcjHaWKp2Q/ICsuC4DSiAcuzCstGlbC+gv4pDV4DD5lmQYL/hhvepvDS87kwrKWZausHB9ADS1OPppyGrxC41m6FUQx3TJAsd6Ewqy7G00Q1SPQJIOwgs1U2A6LBaqpnBRQBp6kH238jm89ApFSEOSnn8DOpBRjWVgQXo2dWzqlcKtJpmUUBR9WijiicVLbsf9SXVIrVYWweqTq+dgLRaJHLQAIU6NGSwExCZ5k4zDZBUf6LppRnoSa/MZRopzUSfvhsgd9C/GyCpbIiFWgMkydGcfSr5srsGDSCjmJUCkqJtTQ00G3crSBsoHvqlOTuAjLsaU4MG0P9qMKPYHcXMg4xR7BRA0KVKwdDdo1gpoDlZBe7Nu89+L3w2H7r4Z036QheZLnqq4U4v5LJBR5p5L21UtQ9d/LMUpE3NM9eFqpxG+wmlF6Kg9H0l1IPmdiH1oIBS95WaHUe6T90VRlLsmVWUviuMArKe4EL7QSJe2Sb9wIXHMU2qmdl1JZC1r9Mff7HuSlxpVNvyABUBslLtCpAsOC4bPSnG8rUM2Jlu2x/iRCFRu8zdD29dspRN/bmUwwZEFMT7WtEKG+Wggy67Cqs6A8iaH61+hqJngLJSnXcPw0Fn0lZAUUNZUfQ7um4DVQzbnA5MVkGemnQEzWtPaTsvWTguh+KRkxb+IotmylVbBYhVgS5TslSZ/b5sgKgElFFTFkhZSh0N6QC0A1TbsqtOQFw/uLBWqWTtpw1MxTzI67B3OaXUfzuU9cDdCpKcXF9NQW349RTHV1PQd/x6itYXCEiG7gLkVd+29gPIQD+ABlAuO0dBo6Ccgv4BuBTlSVYNngwAAAAASUVORK5CYII="/>
+                </div>
+                <div class="fs-sm">음성지원 재시작</div>
+                `
+
             })
             .catch(error => console.error('Error:', error));
           }
   }
   ,face_recognition :{
-                        camera_stream : function() {
-                          /*
-                          자바스크립트 화면 카메라 반사
-                          */
-                          
-                          let video = document.getElementById('video');
-                          if (navigator.mediaDevices.getUserMedia) {
-                              navigator.mediaDevices.getUserMedia({ video: true })
-                              .then(function(stream) {
-                                  video.srcObject = stream;
-                                  after_rendering_module.face_recognition.start_face_recognition();
-                              })
-                              .catch(function(error) {
-                                  console.error("===카메라 접근에 실패했습니다:", error);
-                              });
-                          } else {
-                              alert('===getUserMedia를 지원하지 않는 브라우저입니다.');
-                          }
-                      }
-                      ,start_face_recognition : function(){
+                        start_face_recognition : function(callback){
                         /*
                           cv2, face_recognition 얼굴 인증
                         */
+                        
                         fetch('/start_face_recognition')
                         .then(response => response.json())
                         .then(data => {
-                            alert('===결과:: ' + data.return_result);
-                            after_rendering_module.face_recognition.stop_face_recognition();
+                  
+                            callback(data);
+                            
                         })
                         .catch(error => console.error('Error:', error));
                       }
                       ,stop_face_recognition : function() {
                         // 카메라 종료, 수정 필요. 컴퓨터 카메라 종료가 되는지 확인해야함
-                        let video = document.getElementById('video');
-                        let stream = video.srcObject;
-                        let tracks = stream.getTracks();
-
-                        tracks.forEach(function(track) {
-                            track.stop(); // 각 트랙을 멈춤
-                        });
-
-                        video.srcObject = null; // 비디오 소스를 null로 설정하여 참조 해제
-                        // ajax로 파이썬 카메라 종료하기
+                        fetch('/stop_face_recognition')
+                        .then(response => response.json())
+                        .then(data => {
+                  
+                            console.log("test")
+                            
+                        })
+                        .catch(error => console.error('Error:', error));
                       }
   }
   , active_list: function() {
@@ -199,9 +199,7 @@ function get_prev_page(prev, curr){
     // 이전으로 돌아가기 후처리
     // 음성 종료, 재시작 예정
     // 카메라 종료 
-    if(curr == 'recognition'){
-      stop_face_recognition();
-    }
+    
   })
   .catch(error => console.error('Error loading the page: ', error));
 }

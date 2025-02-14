@@ -1,7 +1,6 @@
 {
-    "recognition": "True",
-    "service_type": "방문목욕",
+    "service_type": "활동보조 2인 이상",
     "service_status": "서비스 진행중",
-    "service_start_time": "2025-02-13 17:24",
+    "service_start_time": "2025-02-14 16:52",
     "service_end_time": ""
 }

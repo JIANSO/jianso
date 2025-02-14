@@ -45,7 +45,7 @@
     
     <div class="px-3 py-2">
       <ul class="nav nav-tabs flex-column" role="tablist">
-        {% if service_status != '서비스 진행중' %}
+        {% if essential_data['service_status'] != '서비스 진행중' %}
         <li class="nav-item">
             <a class="btn btn-info shadow-info w-100" 
             href="#" onclick="get_inner_page('start_step1')" data-bs-toggle="tab" role="tab">
@@ -53,7 +53,7 @@
             </a>
         </li> 
         {% endif %}
-        {% if service_status != '서비스 없음' %}
+        {% if essential_data['service_status'] != '서비스 없음' %}
         <li class="nav-item">
             <a class="btn btn-info shadow-info w-100" 
             href="#" onclick="get_inner_page('end_step1')" data-bs-toggle="tab" role="tab">
@@ -67,12 +67,7 @@
                 서비스 관리
             </a>
           </li>
-        <li class="nav-item">
-          <a class="btn btn-info shadow-info w-100" 
-          href="#" onclick="get_inner_page('recognition')" data-bs-toggle="tab" role="tab">
-            사용자 인증(메뉴삭제예정)
-          </a>
-        </li>
+        
         
       </ul>
     </div>
@@ -90,7 +85,7 @@
     <div class="p-3 ">
       <div class="d-flex justify-content-evenly">
         <button type="button" id="click_button" class="btn btn-lg btn-secondary" 
-        onclick="get_prev_page(prev='main', curr='manage')">이전 단계</button>
+        onclick="get_prev_page(prev='first_gate', curr='manage')">이전 단계</button>
       </div>
     </div>
   </div>

@@ -3,8 +3,6 @@ function get_inner_page(next, user_parameter=''){
   TODO: 
   서비스 진행 중인지 아닌지 여부 파악 필요
   */
-    console.log("====get_inner_page===");
-
     if(user_parameter == ''){
       url_paramter = 'next='+next;
     }else{
@@ -14,7 +12,6 @@ function get_inner_page(next, user_parameter=''){
     fetch('get_page/get_next_page?'+url_paramter)
     .then(response => response.text())  
     .then(html => {
-      
       //페이지 렌더링
       document.getElementById('inner-content').innerHTML = html;
       //페이지 렌더링 후 후처리
@@ -23,45 +20,34 @@ function get_inner_page(next, user_parameter=''){
     .catch(error => console.error('Error loading the page: ', error));
 }
 
-function after_rendering(next){
-  // TODO: 1초 후 시작
-  // TODO: next에 따라서 start_recoding을 하고 안하고 결정하기.
-  // TODO: 서비스 진행중 여부를 항상 화면이 갖고 있도록 할까 고민중입니다.
+function after_rendering(curr){
   
-  if(next == 'manage'){
-    after_rendering_module.stt.start_stt();
-  }else if(next == 'start_step1'){
-  
-    after_rendering_module.stt.start_stt();
+  if(curr == 'first_gate'){
+    /* 모든 파이썬 라이브러리 종료 */
+    after_rendering_module.stt.stop_stt(curr);
+    after_rendering_module.face_recognition.stop_face_recognition();
+  }else if(curr == 'manage'){
+    after_rendering_module.stt.start_stt(curr);
+  }else if(curr == 'start_step1'){
+    after_rendering_module.stt.start_stt(curr);
     after_rendering_module.active_list();
-  }else if(next == 'start_step2'){
-  
-    after_rendering_module.stt.start_stt();
-
+  }else if(curr == 'start_step2'){
+    after_rendering_module.stt.start_stt(curr);
     after_rendering_module.get_currunt_datetime('service_start_time');
-  }else if(next == 'end_step1'){
-    
-    after_rendering_module.stt.start_stt();
-
+  }else if(curr == 'end_step1'){
+    after_rendering_module.stt.start_stt(curr);
     after_rendering_module.get_currunt_service_info(function(data){
       document.getElementById('service_status').innerText = data['service_status'];
       document.getElementById('service_type').innerText = data['service_type'];
       document.getElementById('service_start_time').innerText = data['service_start_time'];
       
-      //종료 시간의 경우 현재 시간
       after_rendering_module.get_currunt_datetime('service_end_time');
     });
   }else if(next == 'recognition'){
-    //추후 모든 모듈마다 붙일 것
-    
-    after_rendering_module.face_recognition.start_face_recognition(function(){
-      document.getElementById('camera_guide').innerHTML = 
-      `<div class="spinner-border" style="width: 3.5rem; height: 3.5rem;"></div>
-       <div class="fs-sm">사용자 인증을 완료했습니다.</div>`
-      after_rendering_module.face_recognition.stop_face_recognition();
-    })
+    after_rendering_module.face_recognition.start_face_recognition()
   }else if(next == 'data'){
-    //after_rendering_module.stt.start_stt();
+    /* 서비스 관리 */
+    after_rendering_module.stt.start_stt(next);
     after_rendering_module.get_currunt_service_info(function(data){
       document.getElementById('service_status').innerText = data['service_status'];
       document.getElementById('service_type').innerText = data['service_type'];
@@ -73,83 +59,116 @@ function after_rendering(next){
 }
 
 after_rendering_module = {
+  /* 페이지 이동 시 실행되는 기능들 */
   stt : {
-          start_stt: function() {
-              /*
-            실시간 음성 인식
-            음성 인식으로 페이지 이동
-            */
+          start_stt: function(curr_page) {
             
-            // 아이콘 변경
+            /* 음성 인식 html 변경 */
             document.getElementById('speech_guide').innerHTML = `
             <div class="spinner-grow text-info" role="status"></div>
             <div class="fs-sm">말씀해 주세요</div>`
-            //TODO 서버 음성 집어넣기
 
-        
-            fetch('/start_stt')
+            fetch('/start_stt?curr_page='+curr_page)
             .then(response => response.json())
             .then(data => {
-                alert('페이지:: ' + data.return_result + '\n사용자 음성:: ' + data.audio_text);
+                console.log('페이지:: ' + data.return_result + '\n사용자 음성:: ' + data.audio_text);
         
-                // llm 통과 후 다음 페이지 넘어갈 예정
-                // 서버에서 처리 후 1,2,3 에 따라 페이지 넘길 예정 
-                after_rendering_module.stt.stop_stt();
-                if(data.return_result !== 0){
-                  
-                  //get_inner_page(data.return_result);
+                /*어떤 페이지에서 발화했는지 중요*/
+                after_rendering_module.stt.stop_stt(curr_page);
+                if(data.return_result !== "404"){
+                  get_inner_page(data.return_result);
         
+                }else{
+                  document.getElementById('speech_guide').innerHTML = `
+                      <div class="speech_circle bg-warning" 
+                      onclick="after_rendering_module.stt.start_stt(${curr_page});">
+                        <img src="static/david/img/play-circle-regular-36.png" /> 
+                      </div>
+                      <div class="fs-sm mt-1">음성지원 재시작</div>
+                      `
                 }
             })
             .catch(error => console.error('Error:', error));
           },
-          stop_stt: function(){
+          stop_stt: function(curr_page){
             fetch('/stop_stt')
-            .then(response => response.json())
-            .then(data => {
+            .then(response => {
+              if(document.getElementById('speech_guide') !== null){
                 document.getElementById('speech_guide').innerHTML = `
-                <div class="speech_circle bg-info m-1" role="status" 
-                onclick="after_rendering_module.stt.start_stt();">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYAAABV7bNHAAAAAXNSR0IArs4c6QAAA2dJREFUeF7tnAtu2zAMhtOTbT1Zt5OtPdkGFuGgGiH582U5KAMUbR1ZJj/+pOSH/HKbj0rgZfjoBAaQoZABNIByRWQUdFEF/bzdbvRDnx+Ljbzt/b7tY/mOtvH2nCwce5+pIHL+bQHjMPNL09/3/35FO/Ds1w2oCorkE8FqVVYXoG4wR2AEqkVRHYDIUEqlHZ9yUJWASDV/dlB5cMwyUFWAIqqh2kGj1Doy8d88mvFvYuBVZQmkCkAeOASAC2tEbFxnUFhpSFlAlFJrlLXRprqIooGhoLxGokH7ZAAhcLKKQfxCQIUhRQEhRlHUzpr5IgNEKN0igCw44WghcjHaWKp2Q/ICsuC4DSiAcuzCstGlbC+gv4pDV4DD5lmQYL/hhvepvDS87kwrKWZausHB9ADS1OPppyGrxC41m6FUQx3TJAsd6Ewqy7G00Q1SPQJIOwgs1U2A6LBaqpnBRQBp6kH238jm89ApFSEOSnn8DOpBRjWVgQXo2dWzqlcKtJpmUUBR9WijiicVLbsf9SXVIrVYWweqTq+dgLRaJHLQAIU6NGSwExCZ5k4zDZBUf6LppRnoSa/MZRopzUSfvhsgd9C/GyCpbIiFWgMkydGcfSr5srsGDSCjmJUCkqJtTQ00G3crSBsoHvqlOTuAjLsaU4MG0P9qMKPYHcXMg4xR7BRA0KVKwdDdo1gpoDlZBe7Nu89+L3w2H7r4Z036QheZLnqq4U4v5LJBR5p5L21UtQ9d/LMUpE3NM9eFqpxG+wmlF6Kg9H0l1IPmdiH1oIBS95WaHUe6T90VRlLsmVWUviuMArKe4EL7QSJe2Sb9wIXHMU2qmdl1JZC1r9Mff7HuSlxpVNvyABUBslLtCpAsOC4bPSnG8rUM2Jlu2x/iRCFRu8zdD29dspRN/bmUwwZEFMT7WtEKG+Wggy67Cqs6A8iaH61+hqJngLJSnXcPw0Fn0lZAUUNZUfQ7um4DVQzbnA5MVkGemnQEzWtPaTsvWTguh+KRkxb+IotmylVbBYhVgS5TslSZ/b5sgKgElFFTFkhZSh0N6QC0A1TbsqtOQFw/uLBWqWTtpw1MxTzI67B3OaXUfzuU9cDdCpKcXF9NQW349RTHV1PQd/x6itYXCEiG7gLkVd+29gPIQD+ABlAuO0dBo6Ccgv4BuBTlSVYNngwAAAAASUVORK5CYII="/>
+                <div class="speech_circle bg-warning" 
+                onclick="after_rendering_module.stt.start_stt(${curr_page});">
+                  <img src="static/david/img/play-circle-regular-36.png" /> 
                 </div>
-                <div class="fs-sm">음성지원 재시작</div>
+                <div class="fs-sm mt-1">음성지원 재시작</div>
                 `
-
-            })
+              }
+              
+          })
+            
             .catch(error => console.error('Error:', error));
           }
   }
   ,face_recognition :{
-                        start_face_recognition : function(callback){
-                        /*
-                          cv2, face_recognition 얼굴 인증
-                        */
-                        
-                        fetch('/start_face_recognition')
-                        .then(response => response.json())
-                        .then(data => {
-                  
-                            callback(data);
-                            
-                        })
-                        .catch(error => console.error('Error:', error));
+                        start_face_recognition : function(){
+                              /*
+                                cv2, face_recognition 얼굴 인증
+                              */
+
+                              //카메라 인증 진행 html
+                              document.getElementById('camera_guide').innerHTML =  
+                              `
+                                <div class="spinner-border" style="width: 3.5rem; height: 3.5rem;"></div>
+                                <div class="fs-sm mt-1">카메라 인증을 진행합니다.</div>`;
+
+                              fetch('/start_face_recognition')
+                              .then(response => response.json())
+                              .then(data => { 
+                                after_rendering_module.face_recognition.after_face_recognition(data['return_result']);
+                                  
+                              })
+                              .catch(error => console.error('Error:', error));
                       }
                       ,stop_face_recognition : function() {
-                        // 카메라 종료, 수정 필요. 컴퓨터 카메라 종료가 되는지 확인해야함
+              
                         fetch('/stop_face_recognition')
-                        .then(response => response.json())
-                        .then(data => {
-                  
-                            console.log("test")
-                            
-                        })
+                        .then(response => {
+                          if (response.ok) {
+                              console.log("===얼굴 인증 종료 완료===");
+                          } else {
+                              console.error("===얼굴 인증 종료 실패===::", response.status);
+                          }
+                      })
                         .catch(error => console.error('Error:', error));
+                      }
+                      , after_face_recognition : function(result){
+                              after_rendering_module.face_recognition.stop_face_recognition();
+                              if(result == 'True'){
+                                document.getElementById('camera_guide').innerHTML = 
+                                                `<div class="d-inline-block" >
+                                                    <img src="static/david/img/user-check-regular-36.png"/>
+                                                </div>
+                                                <div class="fs-sm mt-1">사용자 인증에 성공했습니다.</div>`
+                                
+                                 get_inner_page('manage'); //관리 페이지 이동
+                                
+                              }else if(result == 'False'){
+                                document.getElementById('camera_guide').innerHTML = 
+                                                `<div class="d-inline-block" >
+                                                  <img src="static/david/img/user-x-solid-36.png"/>
+                                                </div>
+                                                <div class="fs-sm mt-1">사용자 인증에 실패했습니다.</div>
+                                                <button type="button" 
+                                                class="btn btn-lg btn-warning mt-1" 
+                              onclick="after_rendering_module.face_recognition.start_face_recognition();">
+                              재인증 요청하기
+                              </button>`
+                        }
+                        
                       }
   }
   , active_list: function() {
     /* 자바스크립트 list active */
     let listGroup = document.querySelector('.list-group');
-    
     listGroup.addEventListener('click', function(event) {
         if (event.target.tagName === 'A') {
             // 모든 'a' 태그에서 'active' 클래스 제거
@@ -157,7 +176,6 @@ after_rendering_module = {
             items.forEach(item => {
                 item.classList.remove('active');
             });
-
             // 클릭된 'a' 태그에만 'active' 클래스 추가
             event.target.classList.add('active');
         }
@@ -165,11 +183,11 @@ after_rendering_module = {
   }
   , get_currunt_datetime : function(time_id){
     const now = new Date();
-    const year = now.getFullYear(); // 연도를 YYYY 형태로 반환
-    const month = (now.getMonth() + 1).toString().padStart(2, '0'); // 월을 MM 형태로 반환 (getMonth()는 0부터 시작하므로 1을 더함)
-    const day = now.getDate().toString().padStart(2, '0'); // 일을 DD 형태로 반환
-    const hours = now.getHours().toString().padStart(2, '0');  // 시간을 두 자리 숫자로 표현
-    const minutes = now.getMinutes().toString().padStart(2, '0');  // 분을 두 자리 숫자로 표현
+    const year = now.getFullYear(); 
+    const month = (now.getMonth() + 1).toString().padStart(2, '0'); 
+    const day = now.getDate().toString().padStart(2, '0'); 
+    const hours = now.getHours().toString().padStart(2, '0'); 
+    const minutes = now.getMinutes().toString().padStart(2, '0');
     
     //해당 id에 값 고정
     document.getElementById(time_id).innerText = `${year}-${month}-${day} ${hours}:${minutes}`;
@@ -180,9 +198,7 @@ after_rendering_module = {
     fetch('module_collection/get_service_data')
      .then(response => response.json())
      .then(data => {
-         
          callback(data);
-        
      })
      .catch(error => console.error('Error:', error));
   }
@@ -199,6 +215,8 @@ function get_prev_page(prev, curr){
     // 이전으로 돌아가기 후처리
     // 음성 종료, 재시작 예정
     // 카메라 종료 
+    //페이지 렌더링 후 후처리
+    after_rendering(prev);
     
   })
   .catch(error => console.error('Error loading the page: ', error));
@@ -235,7 +253,7 @@ function confirm_service(type=""){
     callback = function(){
       document.getElementById("user_guide").innerHTML = `<b>활동지원 서비스가 시작되었습니다.</b>`
       document.getElementById("button_group").innerHTML  = `<button type="button" id="" class="btn btn-lg btn-secondary" 
-      onclick="get_inner_page('main')">처음 화면</button>`
+      onclick="get_inner_page('first_gate')">처음 화면</button>`
     }
   }else if(type=="end"){
     body_data = {
@@ -252,7 +270,7 @@ function confirm_service(type=""){
     callback = function(){
       document.getElementById("user_guide").innerHTML = `<b>활동지원 서비스가 종료되었습니다.</b>`
       document.getElementById("button_group").innerHTML  = `<button type="button" id="" class="btn btn-lg btn-secondary" 
-      onclick="get_inner_page('main')">처음 화면</button>`
+      onclick="get_inner_page('first_gate')">처음 화면</button>`
     }
   }else{
     alert("관리자에게 문의해 주세요.");

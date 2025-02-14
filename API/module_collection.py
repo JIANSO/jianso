@@ -6,14 +6,19 @@ module_collection = Blueprint('module_collection', __name__)
 
 """
 
-
-def get_service_status():
+def get_essential_data():
     
     path = 'static/data/service_info.json'
     with open(path, 'r', encoding='utf-8') as file:
         data = json.load(file)
+    
+    auth_path = 'static/data/auth.json'
+    with open(auth_path, 'r', encoding='utf-8') as auth_file:
+        auth_data = json.load(auth_file)
 
-    return data['service_status']
+    combine_dict = {"service_status" : data["service_status"]} | auth_data
+
+    return combine_dict
 
 @module_collection.route('/get_service_data', methods=['GET'])
 def get_service_data():

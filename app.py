@@ -2,7 +2,6 @@ from flask import Flask, render_template,jsonify, request
 from API.get_page import get_page
 from API.module_collection import module_collection 
 from API.sst import sst
-
 from API.recognition.recognition import face_recognition_class
 import torch
 from transformers import pipeline
@@ -21,8 +20,8 @@ whipser를 그대로 불러오는 경우
 """
 # Whisper 모델 사전 로드
 TRANSCRIBER = pipeline(model="openai/whisper-large-v3-turbo", 
-                    task="automatic-speech-recognition", 
-                    device=device
+                        task="automatic-speech-recognition", 
+                        device=device
                     )
 
 app = Flask(__name__)
@@ -33,24 +32,58 @@ app.config['DEBUG'] = True
 
 @app.route('/')
 def home():
-   
+    import API.module_collection as module
+    module.update_json({"data" :  {"auth" : "False"}, "path" : "auth"})
+
     return render_template("/index.html")
 
-@app.route('/start_stt')
+def get_command_by_page(audio_text, curr_page):
+    """
+    stt 결과 처리
+    """
+
+    # {next page : next 페이지로 가게할 명령어}
+    commands_list = { 
+        "manage" :{
+            "start_step1"   : ["시작", "서비스해"],
+            "end_step1"     : ["종료", "멈춰", "안해", "끝"],
+            "data"          : ["관리", "정보"]
+        }
+        ,"start_step1" : {
+            "start_step2?user_parameter='활동보조'" : ["보조"]
+            ,"start_step2?user_parameter='활동보조 2인이상'" : ["2인 이상"]
+            ,"start_step2?user_parameter='방문목욕'" : ["방문"]
+            ,"start_step2?user_parameter='방문간호'" : ["목욕"]
+            ,"start_step2?user_parameter='방문간호지시서'" : ["지시서"]
+        }
+        ,"start_step2" : {"first_gate" : ["확인"]}
+        ,"end_step1" : {"first_gate" : ["확인"]}
+        ,"data" : {"manage" : ["이전"]}
+        
+    }
+    commands = commands_list['curr_page']
+    return_result = "404"
+    found_keyword = None  # 찾은 키워드를 저장하기 위한 변수
+
+    for command, keywords in commands.items():
+        for keyword in keywords:
+          
+            if keyword in audio_text:
+                found_keyword = keyword  # 찾은 키워드를 변수에 저장
+                print("found_keyword ::", found_keyword)  # 키워드 출력
+                return_result = command
+                break
+        if found_keyword:  # 찾은 키워드가 있으면 루프 종료
+            break
+
+    return return_result
+
+@app.route('/start_stt', methods=['GET'])
 def start_stt():
     audio_text = sst.audio_stream().sst_module(TRANSCRIBER)
-   
-    print("===app.py start_stt===")
-     
-    return_result = "없음"
-    if "시작" in audio_text :
-        return_result = "start"
-    elif "종료" in audio_text :
-        return_result = "end"
-    elif "관리" in audio_text :
-        return_result = "recognition"
-    else :
-        return_result = 0
+    curr_page = request.args.get('curr_page', 'default_value')
+    return_result = get_command_by_page(audio_text, curr_page)
+    
     return jsonify({"return_result": return_result, "audio_text" : audio_text })
 
 @app.route('/stop_stt')
@@ -58,8 +91,8 @@ def stop_stt():
     """
     음성 인식 종료
     """
+
     sst.audio_stream().stream_stop()
-    print("===app.py stop_stt===")
 
     return jsonify({"return_result": 200})
 
@@ -68,14 +101,8 @@ face_recognition_instance = face_recognition_class()
 def start_face_recognition():
     
     return_result = None
-    
     try : 
-        
         return_result = face_recognition_instance.generate_frames()
-        print(".......start_face_recognition")
-        print(".......start_face_recognition", return_result)
-
-        #json에게.. 결과를 알려줘야 하는데.. 값이 이동을 안하네 ^^;
         return jsonify({"return_result": f"{return_result}" })
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -84,12 +111,8 @@ def start_face_recognition():
 
 @app.route('/stop_face_recognition')
 def stop_face_recognition():
-    
     face_recognition_instance.stop_camera()
-
     return  jsonify({"return_result": 200 })
-
-
 
 
 ##########################################################

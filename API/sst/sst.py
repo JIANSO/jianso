@@ -100,9 +100,9 @@ class audio_stream:
                             print("=====STT 결과::", result['text'])
                             result_text = result['text']
                             break
-                    elif silence_frames > 50 :            
+                    elif silence_frames > 100 :            
                         print("=====음성 없음 및 종료::")
-                        result_text = "음성 없음 및 종료"
+                        result_text = "404"
                         break
                     
         

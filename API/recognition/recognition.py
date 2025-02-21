@@ -16,12 +16,11 @@ tccutil reset Camera
 class face_recognition_class :
     def __init__(self):
         try:
-            self.known_image = face_recognition.load_image_file("API/recognition/taya.png")
+            self.known_image = face_recognition.load_image_file("API/recognition/auth.jpg")
             self.known_face_encoding = face_recognition.face_encodings(self.known_image)[0]
             self.camera = None
         except Exception as e:
             print("오류 발생:", e)
-
 
     def start_camera(self):
         # 카메라 설정
@@ -38,14 +37,11 @@ class face_recognition_class :
         exit()
 
     def after_recognition(self, return_result) :
-        
-
         #인증 여부 db 저장하기
         import API.module_collection as module_collection
         module_collection.update_json({"data" :  {"auth" : f"{return_result}"}, "path" : "auth"})
         
     def generate_frames(self):  # 5초 동안 인증 시도
-        
         # 카메라 설정
         self.start_camera()
         start_time = time.time()
@@ -63,13 +59,10 @@ class face_recognition_class :
                 if attempts >= max_attempts:
                     print("===최대 인증 시도 횟수 초과 및 종료")
                     break
-
                 success, frame = self.camera.read()
                 if not success:
                     print("===카메라에서 프레임을 읽을 수 없습니다.")
                     break
-
-            
                 face_locations = face_recognition.face_locations(frame)
                
                 if not face_locations:
@@ -77,7 +70,6 @@ class face_recognition_class :
                     continue  # 얼굴이 감지되지 않으면 다음 프레임 시도
 
                 face_encodings = face_recognition.face_encodings(frame, face_locations)
-
                 for face_encoding in face_encodings:
                     matches = face_recognition.compare_faces([self.known_face_encoding], face_encoding)
                     if True in matches:

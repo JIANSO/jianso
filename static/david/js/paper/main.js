@@ -1,8 +1,5 @@
 function get_inner_page(next, user_parameter=''){
-  /*
-  TODO: 
-  서비스 진행 중인지 아닌지 여부 파악 필요
-  */
+
     if(user_parameter == ''){
       url_paramter = 'next='+next;
     }else{
@@ -43,11 +40,10 @@ function after_rendering(curr){
       
       after_rendering_module.get_currunt_datetime('service_end_time');
     });
-  }else if(next == 'recognition'){
+  }else if(curr == 'recognition'){
     after_rendering_module.face_recognition.start_face_recognition()
-  }else if(next == 'data'){
+  }else if(curr == 'data'){
     /* 서비스 관리 */
-    after_rendering_module.stt.start_stt(next);
     after_rendering_module.get_currunt_service_info(function(data){
       document.getElementById('service_status').innerText = data['service_status'];
       document.getElementById('service_type').innerText = data['service_type'];
@@ -71,22 +67,43 @@ after_rendering_module = {
             fetch('/start_stt?curr_page='+curr_page)
             .then(response => response.json())
             .then(data => {
-                console.log('페이지:: ' + data.return_result + '\n사용자 음성:: ' + data.audio_text);
-        
-                /*어떤 페이지에서 발화했는지 중요*/
-                after_rendering_module.stt.stop_stt(curr_page);
-                if(data.return_result !== "404"){
-                  get_inner_page(data.return_result);
-        
-                }else{
-                  document.getElementById('speech_guide').innerHTML = `
-                      <div class="speech_circle bg-warning" 
-                      onclick="after_rendering_module.stt.start_stt(${curr_page});">
-                        <img src="static/david/img/play-circle-regular-36.png" /> 
-                      </div>
-                      <div class="fs-sm mt-1">음성지원 재시작</div>
-                      `
-                }
+                
+                  /*
+                  어떤 페이지에서 발화했는지 중요!
+                  서비스 시작, 서비스 종료의 경우는
+                  다음 페이지가 아니라
+                  confirm_service
+                  */
+                  after_rendering_module.stt.stop_stt(curr_page);
+
+                  if(data.return_result !== ''){
+                    // 음성 인식 성공
+                    if( data.return_result.includes('&')){
+                      let next = data.return_result.match(/^(.*?)&/)[1];
+                      let user_parameter = data.return_result.match(/&(.*)/)[1];
+                      get_inner_page(next, user_parameter)
+                    }else{
+                      if(curr_page == 'start_step2'){
+                        confirm_service('start');
+                        document.getElementById('speech_guide').innerHTML = '';
+                      }else if(curr_page == 'end_step1'){
+                        confirm_service('end');
+                        document.getElementById('speech_guide').innerHTML = '';
+                      }else{
+                        get_inner_page(data.return_result)
+                      }
+                    }
+                    
+                  }else{
+                    // 음성 인식 실패
+                    document.getElementById('speech_guide').innerHTML = `
+                        <div class="speech_circle bg-warning" 
+                        onclick="after_rendering_module.stt.start_stt('${curr_page}');">
+                          <img src="static/david/img/play-circle-regular-36.png" /> 
+                        </div>
+                        <div class="fs-sm mt-1">음성지원 재시작</div>
+                        `
+                  }
             })
             .catch(error => console.error('Error:', error));
           },
@@ -96,7 +113,7 @@ after_rendering_module = {
               if(document.getElementById('speech_guide') !== null){
                 document.getElementById('speech_guide').innerHTML = `
                 <div class="speech_circle bg-warning" 
-                onclick="after_rendering_module.stt.start_stt(${curr_page});">
+                onclick="after_rendering_module.stt.start_stt('${curr_page}');">
                   <img src="static/david/img/play-circle-regular-36.png" /> 
                 </div>
                 <div class="fs-sm mt-1">음성지원 재시작</div>
@@ -130,16 +147,13 @@ after_rendering_module = {
                       }
                       ,stop_face_recognition : function() {
               
-                        fetch('/stop_face_recognition')
-                        .then(response => {
-                          if (response.ok) {
-                              console.log("===얼굴 인증 종료 완료===");
-                          } else {
-                              console.error("===얼굴 인증 종료 실패===::", response.status);
-                          }
-                      })
-                        .catch(error => console.error('Error:', error));
-                      }
+                            fetch('/stop_face_recognition')
+                            .then(response => response.json())
+                            .then(data => {
+                              console.log("===stop_face_recognition:: "+data);
+                            })
+                            .catch(error => console.error('Error:', error));
+                        }
                       , after_face_recognition : function(result){
                               after_rendering_module.face_recognition.stop_face_recognition();
                               if(result == 'True'){
@@ -212,25 +226,12 @@ function get_prev_page(prev, curr){
   .then(response => response.text())  
   .then(html => {
     document.getElementById('inner-content').innerHTML = html;
-    // 이전으로 돌아가기 후처리
-    // 음성 종료, 재시작 예정
-    // 카메라 종료 
-    //페이지 렌더링 후 후처리
     after_rendering(prev);
     
   })
   .catch(error => console.error('Error loading the page: ', error));
 }
 
-function go_to_start_step2(){
-  // 서비스 시작 시 서비스 유형 선택
-  if (document.querySelector('div[name="service_type"] a.active')==null){
-    alert("서비스 유형을 선택해 주세요");
-    return
-  }  
-
-  get_inner_page('start_step2', user_parameter=document.querySelector('div[name="service_type"] a.active').innerText);
-}
 
 function confirm_service(type=""){
   /* 
@@ -251,7 +252,7 @@ function confirm_service(type=""){
      }
 
     callback = function(){
-      document.getElementById("user_guide").innerHTML = `<b>활동지원 서비스가 시작되었습니다.</b>`
+      document.getElementById("user_guide").innerHTML = `<b>활동지원 서비스가<br/>시작되었습니다.</b>`
       document.getElementById("button_group").innerHTML  = `<button type="button" id="" class="btn btn-lg btn-secondary" 
       onclick="get_inner_page('first_gate')">처음 화면</button>`
     }
@@ -268,7 +269,7 @@ function confirm_service(type=""){
     }
 
     callback = function(){
-      document.getElementById("user_guide").innerHTML = `<b>활동지원 서비스가 종료되었습니다.</b>`
+      document.getElementById("user_guide").innerHTML = `<b>활동지원 서비스가<br/>종료되었습니다.</b>`
       document.getElementById("button_group").innerHTML  = `<button type="button" id="" class="btn btn-lg btn-secondary" 
       onclick="get_inner_page('first_gate')">처음 화면</button>`
     }

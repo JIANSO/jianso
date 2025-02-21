@@ -43,46 +43,50 @@ def get_command_by_page(audio_text, curr_page):
     """
 
     # {next page : next 페이지로 가게할 명령어}
+    # "start_step1" 의 경우.. 생각해 봐야함.
     commands_list = { 
         "manage" :{
             "start_step1"   : ["시작", "서비스해"],
-            "end_step1"     : ["종료", "멈춰", "안해", "끝"],
+            "end_step1"     : ["종료", "정료", "멈춰", "안해", "끝"],
             "data"          : ["관리", "정보"]
         }
         ,"start_step1" : {
-            "start_step2?user_parameter='활동보조'" : ["보조"]
-            ,"start_step2?user_parameter='활동보조 2인이상'" : ["2인 이상"]
-            ,"start_step2?user_parameter='방문목욕'" : ["방문"]
-            ,"start_step2?user_parameter='방문간호'" : ["목욕"]
-            ,"start_step2?user_parameter='방문간호지시서'" : ["지시서"]
+            "start_step2&'활동보조'" : ["보조"]
+            ,"start_step2&활동보조 2인이상" : ["2인","이상"]
+            ,"start_step2&'방문목욕'" : ["목욕"]
+            ,"start_step2&'방문간호'" : ["간호"]
+            ,"start_step2&'방문간호지시서'" : ["지시", "지시서"]
+            ,"manage" : ["이전", "취소"]
         }
-        ,"start_step2" : {"first_gate" : ["확인"]}
-        ,"end_step1" : {"first_gate" : ["확인"]}
-        ,"data" : {"manage" : ["이전"]}
+        ,"start_step2" : {"start_step2" : ["확인", "시작", "끝"], "manage" : ["이전", "취소"]}
+        ,"end_step1" : {"end_step1" : ["확인", "종료", "정료", "끝"],"manage" : ["이전", "취소"]}
+        ,"data" : {"manage" : ["이전", "취소"]}
         
     }
-    commands = commands_list['curr_page']
-    return_result = "404"
+    
+    commands = commands_list[curr_page]
+    return_result = ''
     found_keyword = None  # 찾은 키워드를 저장하기 위한 변수
 
-    for command, keywords in commands.items():
+    for next_url, keywords in commands.items():
         for keyword in keywords:
-          
             if keyword in audio_text:
                 found_keyword = keyword  # 찾은 키워드를 변수에 저장
-                print("found_keyword ::", found_keyword)  # 키워드 출력
-                return_result = command
+                return_result = next_url
                 break
         if found_keyword:  # 찾은 키워드가 있으면 루프 종료
             break
 
+    #return_result{next : '', user_parameter : ''} 형태 갖추도록 수정하기.
+    
     return return_result
 
 @app.route('/start_stt', methods=['GET'])
 def start_stt():
     audio_text = sst.audio_stream().sst_module(TRANSCRIBER)
     curr_page = request.args.get('curr_page', 'default_value')
-    return_result = get_command_by_page(audio_text, curr_page)
+    
+    return_result = get_command_by_page(audio_text.replace(" ", ""), curr_page)
     
     return jsonify({"return_result": return_result, "audio_text" : audio_text })
 
@@ -103,15 +107,17 @@ def start_face_recognition():
     return_result = None
     try : 
         return_result = face_recognition_instance.generate_frames()
-        return jsonify({"return_result": f"{return_result}" })
     except Exception as e:
         print(f"An error occurred: {e}")
-        return_result = None
+     
+
+    return jsonify({"return_result": f"{return_result}" })
     
 
 @app.route('/stop_face_recognition')
 def stop_face_recognition():
     face_recognition_instance.stop_camera()
+
     return  jsonify({"return_result": 200 })
 
 

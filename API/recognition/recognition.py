@@ -1,16 +1,12 @@
 import cv2
 import face_recognition
 import time
-"""
+#########################################
+# 얼굴 인증용 API
+# OpenCV + face_recognition
+#########################################
 
-얼굴 인증 완성본.
-수정 가능.
-taya 얼굴은 인식하는데 
-내 얼굴은 못함.
 
-return 시 성공, 실패 여부 전달할 예정
-tccutil reset Camera
-"""
 # 기존에 저장된 얼굴 이미지 로드
 # 추후 사용자 얼굴 저장
 class face_recognition_class :
@@ -79,13 +75,6 @@ class face_recognition_class :
 
                 if return_result:
                     break
-                
-                """
-                ret, buffer = cv2.imencode('.jpg', frame)
-                frame = buffer.tobytes()
-                yield (b'--frame\r\n'
-                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-                """
 
                 attempts += 1  # 인증 시도 횟수 증가
 

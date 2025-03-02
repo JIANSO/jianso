@@ -4,65 +4,55 @@
     <meta charset="utf-8">
     <title>기술 논문</title>
 
-    <!-- SEO Meta Tags-->
-    <meta name="description" content="">
-    <meta name="keywords" content="">
-    <meta name="author" content="">
-
-    <!-- Viewport-->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="msapplication-TileColor" content="#080032">
     <meta name="theme-color" content="#ffffff">
-
-    <!-- Main Theme Styles + Bootstrap-->
     <link rel="stylesheet" media="screen" href="{{ url_for('static', filename='assets/css/theme.min.css') }}">
     <link rel="stylesheet" media="screen" href="{{ url_for('static', filename='david/css/main.css') }}">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <!-- Page loading styles -->
+
     <style>
 
       .mobile-frame {
-        width: 375px; /* 모바일 디바이스의 평균 가로 크기 */
-        height: 667px; /* 모바일 디바이스의 평균 세로 크기 */
-        margin: auto; /* 페이지 중앙 정렬 */
-        border: 1px solid #ccc; /* 테두리 설정 */
-        /*box-shadow: 0 0 10px rgba(0,0,0,0.5); 그림자 효과로 입체감 추가 */
-        position: relative; /* 포지셔닝 설정 */
-        overflow: hidden; /* 내부 컨텐츠가 벗어나지 않도록 처리 */
+        width: 375px;
+        height: 667px; 
+        margin: auto; 
+        border: 1px solid #ccc; 
+        position: relative; 
+        overflow: hidden; 
       }
       
       .inner-content {
         width: 100%;
         height: 100%;
-        position: absolute; /* 부모 요소에 상대적으로 위치 설정 */
+        position: absolute; 
         top: 0;
         left: 0;
-        overflow-y: auto; /* 내부 스크롤 활성화 */
+        overflow-y: auto; 
       }
 
       .spinner-grow {
-        /*스피너 수정*/
         --si-spinner-animation-speed: 1.5s;
         --si-spinner-width: 3rem;
         --si-spinner-height: 3rem;
       }
 
       .list-group-item {
-        display: flex; /* Flexbox를 사용하여 아이템 내용을 가로로 나열 */
-        align-items: center; /* 세로 중앙 정렬 */
+        display: flex; 
+        align-items: center; 
       }
       
       .item-title {
-        width: 120px; /* 제목 컬럼의 너비 고정 */
-        font-weight: bold; /* 제목을 굵게 표시 */
+        width: 120px; 
+        font-weight: bold; 
       }
       .item-content {
-        flex: 1; /* 내용 부분은 남은 공간을 모두 사용 */
+        flex: 1; 
       }
       
       .speech_circle{
         display: inline-block;
-        border-radius: 50%; /* 원형 만들기 */
+        border-radius: 50%; 
       }
 
       a{
@@ -85,15 +75,10 @@
       </div>
     </div>
   </section>
-
 </main>
-
 
 {% include 'david/comm/footer.html' %} 
 
-<script type="text/javascript">
-
-</script>
   <!-- Back to top button -->
   <a href="#top" class="btn-scroll-top" data-scroll>
     <span class="btn-scroll-top-tooltip text-muted fs-sm me-2">Top</span>

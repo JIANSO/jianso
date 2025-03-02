@@ -3,13 +3,18 @@
   <head>
     <meta charset="utf-8">
     <title>기술 논문</title>
-
+    <!-- 
+    https://jianso.gabia.io/ 용 웹페이지 
+    -->
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="msapplication-TileColor" content="#080032">
     <meta name="theme-color" content="#ffffff">
-
     <link rel="stylesheet" media="screen" href="{{ url_for('static', filename='assets/css/theme.min.css') }}">
     <link rel="stylesheet" media="screen" href="{{ url_for('static', filename='david/css/main.css') }}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
     <style>
 
@@ -18,9 +23,8 @@
         height: 667px; 
         margin: auto; 
         border: 1px solid #ccc; 
-        box-shadow: 0 0 10px rgba(0,0,0,0.5); 
         position: relative; 
-        overflow: hidden; 
+        overflow: hidden;
       }
       
       .inner-content {
@@ -33,17 +37,59 @@
       }
 
       .spinner-grow {
-       
-        --si-spinner-animation-speed: 1s;
+        /*스피너 수정*/
+        --si-spinner-animation-speed: 1.5s;
+        --si-spinner-width: 3rem;
+        --si-spinner-height: 3rem;
       }
-    </style>
 
-    
+      .list-group-item {
+        display: flex; 
+        align-items: center; 
+      }
+      
+      .item-title {
+        width: 120px; 
+        font-weight: bold; 
+      }
+      .item-content {
+        flex: 1;
+      }
+      
+      .speech_circle{
+        display: inline-block;
+        border-radius: 50%; 
+      }
+
+      a{
+        color: rgba(0, 0, 0, 0);
+      }
+      
+    </style>
   </head> 
   <body>
-   
-  {% block content %}
-  {% endblock %}
+<main class="page-wrapper ">
+  
+  <!-- Page content -->
+  <section class="container mt-4 mb-lg-5 pt-lg-2 pb-5">
+    <!-- Blog grid + Sidebar -->
+    <div class="row m-5">
+      <div class="col-xl-12 col-lg-12">
+        <div class="d-flex flex-column justify-content-center align-items-center" id="page_wrapper">
+          {% include 'david/paper/inner_paper.html' %} 
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+
+{% include 'david/comm/footer.html' %} 
+
+<script type="text/javascript">
+
+</script>
   <!-- Back to top button -->
   <a href="#top" class="btn-scroll-top" data-scroll>
     <span class="btn-scroll-top-tooltip text-muted fs-sm me-2">Top</span>
@@ -55,12 +101,6 @@
   <script src="{{ url_for('static', filename='assets/js/theme.min.js') }}"></script>
   <script src="{{ url_for('static', filename='assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
   <script src="{{ url_for('static', filename='assets/vendor/smooth-scroll/dist/smooth-scroll.polyfills.min.js') }}"></script>
-  {% block script %}
-  
-  {% endblock %}
 
-  
-
-  
  </body>
 </html>

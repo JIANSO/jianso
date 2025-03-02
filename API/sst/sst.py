@@ -2,12 +2,10 @@ from flask import jsonify
 import numpy as np
 import pyaudio
 import webrtcvad
-
-"""
-[최종본]
-
-"""
-
+#########################################
+# 음성 인식용 API
+# Whisper
+#########################################
 
 class audio_stream:
     def __init__(self):

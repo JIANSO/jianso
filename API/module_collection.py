@@ -2,9 +2,9 @@ from flask import Flask, render_template, Blueprint, request, jsonify
 import json
 
 module_collection = Blueprint('module_collection', __name__)
-"""
-
-"""
+#########################################
+# 데이터 처리 등 모듈 모음
+#########################################
 
 def get_essential_data():
     

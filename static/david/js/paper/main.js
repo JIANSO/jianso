@@ -84,11 +84,13 @@ after_rendering_module = {
                       get_inner_page(next, user_parameter)
                     }else{
                       if(curr_page == 'start_step2'){
+                        
                         confirm_service('start');
-                        document.getElementById('speech_guide').innerHTML = '';
+                        
                       }else if(curr_page == 'end_step1'){
+                        
                         confirm_service('end');
-                        document.getElementById('speech_guide').innerHTML = '';
+                        
                       }else{
                         get_inner_page(data.return_result)
                       }
@@ -252,6 +254,7 @@ function confirm_service(type=""){
      }
 
     callback = function(){
+      document.getElementById('speech_guide').innerHTML = '';
       document.getElementById("user_guide").innerHTML = `<b>활동지원 서비스가<br/>시작되었습니다.</b>`
       document.getElementById("button_group").innerHTML  = `<button type="button" id="" class="btn btn-lg btn-secondary" 
       onclick="get_inner_page('first_gate')">처음 화면</button>`
@@ -269,6 +272,7 @@ function confirm_service(type=""){
     }
 
     callback = function(){
+      document.getElementById('speech_guide').innerHTML = '';
       document.getElementById("user_guide").innerHTML = `<b>활동지원 서비스가<br/>종료되었습니다.</b>`
       document.getElementById("button_group").innerHTML  = `<button type="button" id="" class="btn btn-lg btn-secondary" 
       onclick="get_inner_page('first_gate')">처음 화면</button>`

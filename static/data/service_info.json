@@ -1,6 +1,6 @@
 {
-    "service_type": "",
-    "service_status": "서비스 없음",
-    "service_start_time": "",
+    "service_type": "'활동보조'",
+    "service_status": "서비스 진행중",
+    "service_start_time": "2025-02-21 17:08",
     "service_end_time": ""
 }

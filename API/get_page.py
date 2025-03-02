@@ -3,9 +3,9 @@ import json
 import API.module_collection as module_collection
 
 get_page = Blueprint('get_page', __name__)
-"""
-inner page html만 전달하는 함수 모음
-"""
+#########################################
+# 이전/다음 페이지 호출용 py
+#########################################
 
 
 @get_page.route('/get_prev_page', methods=['GET'])

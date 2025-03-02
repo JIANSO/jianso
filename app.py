@@ -13,11 +13,6 @@ else:
 if torch.backends.mps.is_available():
     device = "mps"  # Apple Metal Performance Shaders
 
-"""
-속도 개선
-pipeline을 사용하는 경우
-whipser를 그대로 불러오는 경우
-"""
 # Whisper 모델 사전 로드
 TRANSCRIBER = pipeline(model="openai/whisper-large-v3-turbo", 
                         task="automatic-speech-recognition", 
@@ -46,20 +41,20 @@ def get_command_by_page(audio_text, curr_page):
     # "start_step1" 의 경우.. 생각해 봐야함.
     commands_list = { 
         "manage" :{
-            "start_step1"   : ["시작", "서비스해"],
+            "start_step1"   : ["시작", "서비스해", "사비스시작"],
             "end_step1"     : ["종료", "정료", "멈춰", "안해", "끝"],
-            "data"          : ["관리", "정보"]
+            "data"          : ["관리", "강리", "정보"]
         }
         ,"start_step1" : {
             "start_step2&'활동보조'" : ["보조"]
             ,"start_step2&활동보조 2인이상" : ["2인","이상"]
-            ,"start_step2&'방문목욕'" : ["목욕"]
-            ,"start_step2&'방문간호'" : ["간호"]
+            ,"start_step2&'방문목욕'" : ["목욕","모굑"]
+            ,"start_step2&'방문간호'" : ["간호", "강호"]
             ,"start_step2&'방문간호지시서'" : ["지시", "지시서"]
             ,"manage" : ["이전", "취소"]
         }
-        ,"start_step2" : {"start_step2" : ["확인", "시작", "끝"], "manage" : ["이전", "취소"]}
-        ,"end_step1" : {"end_step1" : ["확인", "종료", "정료", "끝"],"manage" : ["이전", "취소"]}
+        ,"start_step2" : {"start_step2" : ["확인", "화긴", "시작", "끝"], "manage" : ["이전", "취소"]}
+        ,"end_step1" : {"end_step1" : ["확인", "화긴", "종료", "정료", "끝"],"manage" : ["이전", "취소"]}
         ,"data" : {"manage" : ["이전", "취소"]}
         
     }
@@ -77,7 +72,6 @@ def get_command_by_page(audio_text, curr_page):
         if found_keyword:  # 찾은 키워드가 있으면 루프 종료
             break
 
-    #return_result{next : '', user_parameter : ''} 형태 갖추도록 수정하기.
     
     return return_result
 
